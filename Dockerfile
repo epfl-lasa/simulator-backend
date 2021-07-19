@@ -18,8 +18,7 @@ RUN sudo pip3 install pybullet
 FROM core-dependencies AS workspace
 
 WORKDIR ${HOME}/ros2_ws/
-RUN cd src && git clone https://github.com/domire8/franka_panda_description.git \
-    && cd franka_panda_description && git checkout feature/ros2
+RUN cd src && git clone -b ros2/foxy --single-branch https://github.com/domire8/franka_panda_description.git
 RUN /bin/bash -c "source /opt/ros/foxy/setup.bash; colcon build --symlink-install"
 
 
