@@ -21,25 +21,12 @@ WORKDIR ${HOME}/ros2_ws/
 RUN cd src && git clone -b ros2/foxy --single-branch https://github.com/domire8/franka_panda_description.git
 RUN su ${USER} -c /bin/bash -c "source /opt/ros/foxy/setup.bash; colcon build --symlink-install"
 
+# Clean image
+RUN sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
+
 
 # ros user with everything pre-built
 FROM workspace AS runtime
 
 COPY --chown=${USER} ./pybullet_ros2/ ./src/pybullet_ros2/
 RUN su ${USER} -c /bin/bash -c "source ${HOME}/ros2_ws/install/setup.bash; colcon build --symlink-install"
-
-# Clean image
-RUN sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
-
-# start as the user on default login unless the CMD is overridden.
-CMD su --login ${USER}
-
-
-# dev user to be used with shared volume
-FROM workspace AS develop
-
-# Clean image
-RUN sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
-
-# start as the user on default login unless the CMD is overridden.
-CMD su --login ${USER}

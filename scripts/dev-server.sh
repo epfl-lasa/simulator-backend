@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 IMAGE_NAME=simulator-backend
-MULTISTAGE_TARGET=develop
+MULTISTAGE_TARGET=workspace
 CONTAINER_NAME="${IMAGE_NAME/\//-}"
 CONTAINER_NAME="${CONTAINER_NAME/:/-}-ssh"
 
