@@ -18,7 +18,7 @@ docker volume create --driver local \
     --opt o="bind" \
     "${IMAGE_NAME}_ros2_pkg_vol"
 
-RUN_FLAGS=(-u root)
+RUN_FLAGS=(-u ros2)
 if [[ "$OSTYPE" == "darwin"* ]]; then
   RUN_FLAGS+=(-e DISPLAY=host.docker.internal:0)
 else
