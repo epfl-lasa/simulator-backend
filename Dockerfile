@@ -19,14 +19,14 @@ FROM core-dependencies AS workspace
 
 WORKDIR ${HOME}/ros2_ws/
 RUN cd src && git clone -b ros2/foxy --single-branch https://github.com/domire8/franka_panda_description.git
-RUN /bin/bash -c "source /opt/ros/foxy/setup.bash; colcon build --symlink-install"
+RUN su ${USER} -c /bin/bash -c "source /opt/ros/foxy/setup.bash; colcon build --symlink-install"
 
 
 # ros user with everything pre-built
 FROM workspace AS runtime
 
 COPY --chown=${USER} ./pybullet_ros2/ ./src/pybullet_ros2/
-RUN cd ${HOME}/ros2_ws && /bin/bash -c "source ${HOME}/ros2_ws/install/setup.bash; colcon build --symlink-install"
+RUN su ${USER} -c /bin/bash -c "source ${HOME}/ros2_ws/install/setup.bash; colcon build --symlink-install"
 
 # Clean image
 RUN sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
@@ -37,15 +37,6 @@ CMD su --login ${USER}
 
 # dev user to be used with shared volume
 FROM workspace AS develop
-
-#ENV USER ros2
-#ENV HOME /home/${USER}
-#
-#ARG UID=1000
-#ARG GID=1000
-#RUN groupmod --gid ${GID} ${USER}
-#RUN usermod --uid ${UID} ${USER}
-#USER ${USER}
 
 # Clean image
 RUN sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
