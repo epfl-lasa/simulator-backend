@@ -26,4 +26,4 @@ BUILD_FLAGS+=(-t "${IMAGE_NAME}:${MULTISTAGE_TARGET}")
 BUILD_FLAGS+=(--target "${MULTISTAGE_TARGET}")
 
 docker pull ghcr.io/aica-technology/ros2-ws:foxy
-DOCKER_BUILDKIT=1 docker build "${BUILD_FLAGS[@]}" .. || exit
+DOCKER_BUILDKIT=1 docker build "${BUILD_FLAGS[@]}" . || exit
