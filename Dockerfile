@@ -1,5 +1,5 @@
 ARG ROS_DISTRO=foxy
-FROM aica-technology/ros2-ws:${ROS_DISTRO} as core-dependencies
+FROM ghcr.io/aica-technology/ros2-ws:${ROS_DISTRO} as core-dependencies
 
 ENV DEBIAN_FRONTEND=noninteractive
 
