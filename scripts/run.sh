@@ -3,7 +3,7 @@
 # change to true if using nvidia graphic cards
 USE_NVIDIA_TOOLKIT=false
 
-IMAGE_NAME=simulator-backend
+IMAGE_NAME=aica-technology/simulator-backend
 MULTISTAGE_TARGET=runtime
 CONTAINER_NAME="${IMAGE_NAME/\//-}"
 CONTAINER_NAME="${CONTAINER_NAME/:/-}-${MULTISTAGE_TARGET}"

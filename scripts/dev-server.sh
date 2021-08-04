@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-IMAGE_NAME=simulator-backend
+IMAGE_NAME=aica-technology/simulator-backend
 MULTISTAGE_TARGET=workspace
 CONTAINER_NAME="${IMAGE_NAME/\//-}"
 CONTAINER_NAME="${CONTAINER_NAME/:/-}-ssh"

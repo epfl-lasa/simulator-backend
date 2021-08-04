@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-IMAGE_NAME=simulator-backend
+IMAGE_NAME=aica-technology/simulator-backend
 MULTISTAGE_TARGET=runtime
 
 # BUILD
@@ -25,4 +25,5 @@ fi
 BUILD_FLAGS+=(-t "${IMAGE_NAME}:${MULTISTAGE_TARGET}")
 BUILD_FLAGS+=(--target "${MULTISTAGE_TARGET}")
 
+docker pull aica-technology/ros2-ws:foxy
 DOCKER_BUILDKIT=1 docker build "${BUILD_FLAGS[@]}" .. || exit
