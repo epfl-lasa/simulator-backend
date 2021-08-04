@@ -13,6 +13,7 @@ RUN sudo apt-get update && sudo apt-get install -y \
 
 # install pybullet
 RUN sudo pip3 install pybullet
+RUN sudo pip3 install pyyaml
 
 
 FROM core-dependencies AS workspace
