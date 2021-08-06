@@ -8,7 +8,7 @@ import rclpy.node
 import yaml
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription, LaunchService
-from launch.substitutions import Command, LaunchConfiguration
+from launch.substitutions import Command
 
 
 class PreLoader(rclpy.node.Node):
@@ -56,15 +56,10 @@ def main():
                 "robot_description": Command(
                     ["xacro ", os.path.join(get_package_share_directory(yaml_content[robot]["urdf"]["package"]),
                                             yaml_content[robot]["urdf"]["path"]), " arm_id:=", robot, " xyz:='",
-                     " ".join(str(pos) for pos in yaml_content[robot]["position"]), "' rpy:='0 0 0'"])
+                     " ".join(str(pos) for pos in yaml_content[robot]["position"]), "' rpy:='",
+                     " ".join(str(pos) for pos in yaml_content[robot]["rpy"]), "'"])
             }],
         ))
-        # nodes.append(launch_ros.actions.Node(
-        #     package='joint_state_publisher_gui',
-        #     executable='joint_state_publisher_gui',
-        #     name='joint_state_publisher_gui',
-        #     namespace=robot,
-        # ))
 
     if preloader.get_parameter("rviz_bringup").get_parameter_value().bool_value:
         nodes.append(launch_ros.actions.Node(

@@ -30,9 +30,7 @@ class PyBulletRosWrapper(rclpy.node.Node):
                 ("parallel_plugin_execution", None),
             ])
         self._pb = importlib.import_module("pybullet")
-        #     self._loop_rate = rospy.get_param("~loop_rate", 80.0)
-        #
-        # print("\033[34m")  # print PyBullet stuff in blue
+
         self._simulation = PyBulletSim(self)
         #     # create object of environment class for later use
         #     env_plugin = rospy.get_param("~environment", "environment")  # default : plugins/environment.py
@@ -76,67 +74,49 @@ class PyBulletRosWrapper(rclpy.node.Node):
                 module_ = plugin_.pop("module")
                 class_ = plugin_.pop("class")
                 params_ = plugin_.copy()
-                print(
+                self.get_logger().info(
                     "[PyBulletRosWrapper::init] Loading plugin: {} class from {} for robot {}".format(class_, module_,
                                                                                                       robot_name))
                 # create object of the imported file class
                 obj = getattr(importlib.import_module(module_), class_)(self, self._pb, robot, **params_)
                 # store objects in member variable for future use
                 self._plugins.append(obj)
-        print("[PyBulletRosWrapper::init] PyBullet ROS wrapper initialized.")
+        self.get_logger().info("[PyBulletRosWrapper::init] PyBullet ROS wrapper initialized.")
 
-    #     print("\033[0m")
+    def _start_pybullet_ros_wrapper_sequential(self):
+        """
+        This function is deprecated, we recommend the use of parallel plugin execution
+        """
+        if not self._simulation.is_paused():
+            for task in self._plugins:
+                task.execute()
+            # perform all the actions in a single forward dynamics simulation step
+            self._simulation.step()
 
-    # def _start_pybullet_ros_wrapper_sequential(self):
-    #     """
-    #     This function is deprecated, we recommend the use of parallel plugin execution
-    #     """
-    #     rate = rospy.Rate(self._loop_rate)
-    #     while not rospy.is_shutdown():
-    #         if not self._simulation.is_paused():
-    #             # run x plugins
-    #             for task in self._plugins:
-    #                 task.execute()
-    #             # perform all the actions in a single forward dynamics simulation step such
-    #             # as collision detection, constraint solving and integration
-    #             self._simulation.step()
-    #         rate.sleep()
-    #     rospy.logwarn("[PyBulletROSWrapper::start_pybullet_ros_wrapper_sequential] Killing all programs now.")
-    #     if self._simulation.is_alive():
-    #         del self._simulation
-
-    def _start_pybullet_ros_wrapper_parallel(self):
+    def _start_pybullet_ros_wrapper_parallel(self, loop_rate):
         """
         Execute plugins in parallel, however watch their execution time and warn if exceeds the deadline (loop rate)
         """
         exec_manager_obj = FuncExecManager(self._plugins, rclpy.ok, self._simulation.step,
-                                           self._simulation.is_paused,
-                                           log_info=self.get_logger().info, log_warn=self.get_logger().warn,
-                                           log_debug=self.get_logger().debug, function_name="plugin")
+                                           self._simulation.is_paused, log_info=self.get_logger().info,
+                                           log_warn=self.get_logger().warn, log_debug=self.get_logger().debug)
         # start parallel execution of all "execute" class methods in a synchronous way
-        exec_manager_obj.start_synchronous_execution(
-            loop_rate=self.get_parameter("loop_rate").get_parameter_value().double_value)
-        self.get_logger().warn("[PyBulletROSWrapper::start_pybullet_ros_wrapper_parallel] Killing all programs now.")
-        if self._simulation.is_alive():
-            del self._simulation
+        exec_manager_obj.start_synchronous_execution(loop_rate=loop_rate)
 
     def start_pybullet_ros_wrapper(self):
+        loop_rate = self.get_parameter("loop_rate").get_parameter_value().double_value
         if self.get_parameter("parallel_plugin_execution").get_parameter_value().bool_value:
-            self._start_pybullet_ros_wrapper_parallel()
-        # else:
-        #     self._start_pybullet_ros_wrapper_sequential()
+            self._start_pybullet_ros_wrapper_parallel(loop_rate)
+        else:
+            self.create_timer(1. / loop_rate, self._start_pybullet_ros_wrapper_sequential)
 
 
 def main():
     """Function called by pybullet_ros_node script"""
     rclpy.init()
     node = PyBulletRosWrapper("pybullet_ros2")
-    print(node.get_parameter("loop_rate").get_parameter_value().double_value)
     node.start_pybullet_ros_wrapper()
     rclpy.spin(node)
 
     node.destroy_node()
     rclpy.shutdown()
-    # rospy.init_node("pybullet_ros", anonymous=False)  # node name gets overridden if launched by a launch file
-    # pybullet_ros_interface = PyBulletRosWrapper()
-    # pybullet_ros_interface.start_pybullet_ros_wrapper()

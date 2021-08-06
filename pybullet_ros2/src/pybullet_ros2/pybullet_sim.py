@@ -48,12 +48,6 @@ class PyBulletSim(object):
         self.node_.create_service(Trigger, os.path.join(self.node_.get_name(), "unpause_simulation"),
                                   self.unpause_simulation)
 
-    def __del__(self):
-        """
-        Disconnect the physics server
-        """
-        pb.disconnect(self._uid)
-
     @property
     def uid(self):
         """
