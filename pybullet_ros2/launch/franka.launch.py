@@ -3,57 +3,54 @@ import os
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.conditions import IfCondition
-from launch.substitutions import LaunchConfiguration, TextSubstitution, Command
+from launch.substitutions import LaunchConfiguration, TextSubstitution
 from launch_ros.actions import Node
 
 
 def generate_launch_description():
     # args that can be set from the command line or a default will be used
-    robot_name = DeclareLaunchArgument("robot_name", default_value=TextSubstitution(text="franka"))
+    robot_config = DeclareLaunchArgument("robot_config", default_value=TextSubstitution(
+        text=os.path.join(get_package_share_directory("pybullet_ros2"), "config/franka_config.yaml")))
+
+    # plugin_import_prefix = DeclareLaunchArgument("plugin_import_prefix",
+    #                                              default_value=TextSubstitution(text="pybullet_ros.plugins"))
+    # environment = DeclareLaunchArgument("environment", default_value=TextSubstitution(text="environment"))
     rviz_bringup = DeclareLaunchArgument("rviz_bringup", default_value=TextSubstitution(text="True"))
     rviz_config = DeclareLaunchArgument("rviz_config", default_value=TextSubstitution(
         text=os.path.join(get_package_share_directory("pybullet_ros2"), "config/franka.rviz")))
-    urdf_path = DeclareLaunchArgument("urdf_path", default_value=TextSubstitution(
-        text=os.path.join(get_package_share_directory("franka_panda_description"), "robots", "panda_arm.urdf.xacro")))
+    pybullet_gui = DeclareLaunchArgument("pybullet_gui", default_value=TextSubstitution(text="True"))
+    gui_options = DeclareLaunchArgument("gui_options", default_value=TextSubstitution(text=""))
+    start_paused = DeclareLaunchArgument("start_paused", default_value=TextSubstitution(text="False"))
+    loop_rate = DeclareLaunchArgument("loop_rate", default_value="500.0")
+    parallel_plugin_execution = DeclareLaunchArgument("parallel_plugin_execution",
+                                                      default_value=TextSubstitution(text="True"))
+    # use_deformable_world = DeclareLaunchArgument("use_deformable_world", default_value=TextSubstitution(text="False"))
 
-    robot_state_publisher_node = Node(
-        package="robot_state_publisher",
-        executable="robot_state_publisher",
-        name="robot_state_publisher",
-        namespace=LaunchConfiguration("robot_name"),
+    preloader_node = Node(
+        package="pybullet_ros2",
+        executable="preloader",
+        name="preloader_node",
         output="screen",
         parameters=[{
-            "urdf_path": LaunchConfiguration("urdf_path"),
-            "robot_description": Command(
-                ["xacro ", LaunchConfiguration("urdf_path"), " arm_id:=", LaunchConfiguration("robot_name"),
-                 " xyz:='0 0 0' rpy:='0 0 0'"])
-        }],
-    )
-
-    joint_state_publisher_gui_node = Node(
-        package='joint_state_publisher_gui',
-        executable='joint_state_publisher_gui',
-        name='joint_state_publisher_gui',
-        namespace=LaunchConfiguration("robot_name"),
-    )
-
-    rviz_node = Node(
-        package="rviz2",
-        executable="rviz2",
-        name="rviz2",
-        arguments=["-d", LaunchConfiguration("rviz_config")],
-        condition=IfCondition(LaunchConfiguration("rviz_bringup")),
-        output="screen",
-        emulate_tty=True,
+            "robot_config": LaunchConfiguration("robot_config"),
+            "rviz_bringup": LaunchConfiguration("rviz_bringup"),
+            "rviz_config": LaunchConfiguration("rviz_config"),
+            "pybullet_gui": LaunchConfiguration("pybullet_gui"),
+            "gui_options": LaunchConfiguration("gui_options"),
+            "start_paused": LaunchConfiguration("start_paused"),
+            "loop_rate": LaunchConfiguration("loop_rate"),
+            "parallel_plugin_execution": LaunchConfiguration("parallel_plugin_execution"),
+        }]
     )
 
     return LaunchDescription([
-        robot_name,
+        robot_config,
         rviz_bringup,
         rviz_config,
-        urdf_path,
-        robot_state_publisher_node,
-        joint_state_publisher_gui_node,
-        rviz_node,
+        pybullet_gui,
+        gui_options,
+        start_paused,
+        loop_rate,
+        parallel_plugin_execution,
+        preloader_node
     ])
