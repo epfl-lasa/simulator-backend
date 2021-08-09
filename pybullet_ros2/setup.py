@@ -23,7 +23,4 @@ setup(
     license='TODO',
     package_dir={'': 'src'},
     tests_require=['pytest'],
-    # entry_points={
-    #     'console_scripts': ['pybullet_ros_node = pybullet_ros.pybullet_ros:main']
-    # }
 )
