@@ -8,7 +8,7 @@ franka:
   use_inertia_from_file: True
   #  max_effort: 100.0 # the max force to apply to the robot joints in vel mode
   plugins:
-    #    - module: pybullet_ros2.plugins.control
-    #      class: Control
+    - module: pybullet_ros2.plugins.control
+      class: Control
     - module: pybullet_ros2.plugins.joint_state_publisher
       class: JointStatePublisher
