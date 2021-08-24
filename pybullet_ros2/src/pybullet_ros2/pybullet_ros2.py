@@ -6,7 +6,6 @@ import os
 import rclpy
 import rclpy.node
 from rcl_interfaces.srv import GetParameters
-from rcl_interfaces.msg import ParameterType
 from ament_index_python import get_package_share_directory
 
 from .function_exec_manager import FuncExecManager
