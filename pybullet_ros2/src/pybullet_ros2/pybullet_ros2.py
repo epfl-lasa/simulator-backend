@@ -22,12 +22,12 @@ class PyBulletRosWrapper(rclpy.node.Node):
         self.declare_parameters(
             namespace="",
             parameters=[
-                ("robot_config", None),
-                ("pybullet_gui", None),
-                ("gui_options", None),
-                ("start_paused", None),
-                ("loop_rate", None),
-                ("parallel_plugin_execution", None),
+                ("robot_config", rclpy.Parameter.Type.STRING),
+                ("pybullet_gui", rclpy.Parameter.Type.BOOL),
+                ("gui_options", rclpy.Parameter.Type.STRING),
+                ("start_paused", rclpy.Parameter.Type.BOOL),
+                ("loop_rate", rclpy.Parameter.Type.DOUBLE),
+                ("parallel_plugin_execution", rclpy.Parameter.Type.BOOL),
             ])
         self._pb = importlib.import_module("pybullet")
 
