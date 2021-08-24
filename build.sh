@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
+ROS_VERSION=galactic
 
 IMAGE_NAME=aica-technology/simulator-backend
+IMAGE_TAG=latest
 
 # BUILD
 BUILD_FLAGS=()
@@ -13,14 +15,8 @@ while [ "$#" -gt 0 ]; do
 done
 shift "$(( OPTIND - 1 ))"
 
-if [[ "$OSTYPE" != "darwin"* ]]; then
-  USER_ID="$(id -u "${USER}")"
-  GROUP_ID="$(id -g "${USER}")"
-  BUILD_FLAGS+=(--build-arg UID="${USER_ID}")
-  BUILD_FLAGS+=(--build-arg GID="${GROUP_ID}")
-fi
+BUILD_FLAGS+=(--build-arg ROS_VERSION="${ROS_VERSION}")
+BUILD_FLAGS+=(-t "${IMAGE_NAME}":"${IMAGE_TAG}")
 
-BUILD_FLAGS+=(-t "${IMAGE_NAME}:latest")
-
-docker pull ghcr.io/aica-technology/ros2-ws:foxy
+docker pull ghcr.io/aica-technology/ros2-ws:"${ROS_VERSION}"
 DOCKER_BUILDKIT=1 docker build "${BUILD_FLAGS[@]}" . || exit

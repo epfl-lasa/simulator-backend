@@ -6,6 +6,7 @@ import os
 import rclpy
 import rclpy.node
 from rcl_interfaces.srv import GetParameters
+from rcl_interfaces.msg import ParameterType
 from ament_index_python import get_package_share_directory
 
 from .function_exec_manager import FuncExecManager
@@ -22,12 +23,12 @@ class PyBulletRosWrapper(rclpy.node.Node):
         self.declare_parameters(
             namespace="",
             parameters=[
-                ("robot_config", None),
-                ("pybullet_gui", None),
-                ("gui_options", None),
-                ("start_paused", None),
-                ("loop_rate", None),
-                ("parallel_plugin_execution", None),
+                ("robot_config", rclpy.Parameter.Type.STRING),
+                ("pybullet_gui", rclpy.Parameter.Type.BOOL),
+                ("gui_options", rclpy.Parameter.Type.STRING),
+                ("start_paused", rclpy.Parameter.Type.BOOL),
+                ("loop_rate", rclpy.Parameter.Type.DOUBLE),
+                ("parallel_plugin_execution", rclpy.Parameter.Type.BOOL),
             ])
         self._pb = importlib.import_module("pybullet")
 
