@@ -6,7 +6,8 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /Franka1
+        - /Papa1
+        - /Quebec1
       Splitter Ratio: 0.5
     Tree Height: 615
   - Class: rviz_common/Selection
@@ -48,23 +49,41 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        franka_link0:
+        papa_link0:
           Value: true
-        franka_link1:
+        papa_link1:
           Value: true
-        franka_link2:
+        papa_link2:
           Value: true
-        franka_link3:
+        papa_link3:
           Value: true
-        franka_link4:
+        papa_link4:
           Value: true
-        franka_link5:
+        papa_link5:
           Value: true
-        franka_link6:
+        papa_link6:
           Value: true
-        franka_link7:
+        papa_link7:
           Value: true
-        franka_link8:
+        papa_link8:
+          Value: true
+        quebec_link0:
+          Value: true
+        quebec_link1:
+          Value: true
+        quebec_link2:
+          Value: true
+        quebec_link3:
+          Value: true
+        quebec_link4:
+          Value: true
+        quebec_link5:
+          Value: true
+        quebec_link6:
+          Value: true
+        quebec_link7:
+          Value: true
+        quebec_link8:
           Value: true
         world:
           Value: true
@@ -75,15 +94,25 @@ Visualization Manager:
       Show Names: false
       Tree:
         world:
-          franka_link0:
-            franka_link1:
-              franka_link2:
-                franka_link3:
-                  franka_link4:
-                    franka_link5:
-                      franka_link6:
-                        franka_link7:
-                          franka_link8:
+          papa_link0:
+            papa_link1:
+              papa_link2:
+                papa_link3:
+                  papa_link4:
+                    papa_link5:
+                      papa_link6:
+                        papa_link7:
+                          papa_link8:
+                            {}
+          quebec_link0:
+            quebec_link1:
+              quebec_link2:
+                quebec_link3:
+                  quebec_link4:
+                    quebec_link5:
+                      quebec_link6:
+                        quebec_link7:
+                          quebec_link8:
                             {}
       Update Interval: 0
       Value: true
@@ -97,7 +126,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /franka/robot_description
+        Value: /papa/robot_description
       Enabled: true
       Links:
         All Links Enabled: true
@@ -105,47 +134,47 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        franka_link0:
+        papa_link0:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        franka_link1:
+        papa_link1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        franka_link2:
+        papa_link2:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        franka_link3:
+        papa_link3:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        franka_link4:
+        papa_link4:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        franka_link5:
+        papa_link5:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        franka_link6:
+        papa_link6:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        franka_link7:
+        papa_link7:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        franka_link8:
+        papa_link8:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -153,7 +182,78 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-      Name: Franka
+      Name: Papa
+      TF Prefix: ""
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
+    - Alpha: 1
+      Class: rviz_default_plugins/RobotModel
+      Collision Enabled: false
+      Description File: ""
+      Description Source: Topic
+      Description Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /quebec/robot_description
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        quebec_link0:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        quebec_link1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        quebec_link2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        quebec_link3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        quebec_link4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        quebec_link5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        quebec_link6:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        quebec_link7:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        quebec_link8:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        world:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+      Name: Quebec
       TF Prefix: ""
       Update Interval: 0
       Value: true
@@ -216,10 +316,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.4853980243206024
+      Pitch: 0.3203981816768646
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.8303922414779663
+      Yaw: 5.478575229644775
     Saved: ~
 Window Geometry:
   Displays:
@@ -235,5 +335,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1200
-  X: 1054
-  Y: 156
+  X: 799
+  Y: 98
