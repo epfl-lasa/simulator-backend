@@ -59,21 +59,3 @@ docker cp aica-technology-simulator-backend-ssh:/home/<user>/path/within/contain
 ### Pycharm setup for integrated Python development
 
 TODO when [ros-pycharm-example](https://github.com/domire8/ros-pycharm-example) PRs are merged.
-
-## Run the first example
-
-After building the image, spin up an interactive runtime container:
-
-```bash
-cd path/to/aica-technology/docker-images/scripts
-bash run_interactive.sh aica-technology/simulator-backend -u ros2
-```
-
-Inside the container, run
-
-```bash
-ros2 launch pybullet_ros2 visualize_franka.launch.py
-```
-
-You should see a RViz window with the Franka as well as the Joint State Publisher GUI that you can use to change the
-joint configuration of the Franka.

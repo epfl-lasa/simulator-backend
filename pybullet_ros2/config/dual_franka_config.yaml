@@ -1,0 +1,29 @@
+papa:
+  urdf:
+    package: franka_panda_description
+    path: robots/panda_arm.urdf.xacro
+  position: [ 0, 0, 0 ]
+  rpy: [ 0, 0, -1.57 ]
+  fixed_base: True
+  use_inertia_from_file: True
+  #  max_effort: 100.0 # the max force to apply to the robot joints in vel mode
+  plugins:
+    - module: pybullet_ros2.plugins.control
+      class: Control
+    - module: pybullet_ros2.plugins.joint_state_publisher
+      class: JointStatePublisher
+
+quebec:
+  urdf:
+    package: franka_panda_description
+    path: robots/panda_arm.urdf.xacro
+  position: [ 1, 0, 0 ]
+  rpy: [ 0, 0, -1.57 ]
+  fixed_base: True
+  use_inertia_from_file: True
+  plugins:
+    - module: pybullet_ros2.plugins.control
+      class: Control
+    - module: pybullet_ros2.plugins.joint_state_publisher
+      class: JointStatePublisher
+
