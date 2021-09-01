@@ -3,9 +3,6 @@ FROM ghcr.io/aica-technology/ros2-ws:${ROS_VERSION}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-ENV NVIDIA_VISIBLE_DEVICES all
-ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
-
 ARG ROS_VERSION=foxy
 RUN sudo apt-get update && sudo apt-get install -y \
     ros-${ROS_VERSION}-xacro \
@@ -13,11 +10,10 @@ RUN sudo apt-get update && sudo apt-get install -y \
     && sudo rm -rf /var/lib/apt/lists/*
 
 # install pybullet
-RUN sudo pip3 install pybullet
-RUN sudo pip3 install pyyaml
+RUN sudo pip3 install pybullet pyyaml
 
 WORKDIR ${HOME}/ros2_ws/
-RUN cd src && git clone -b ros2/foxy --single-branch https://github.com/domire8/franka_panda_description.git
+RUN cd src && git clone -b develop --single-branch https://github.com/domire8/franka_panda_description.git
 COPY --chown=${USER} ./pybullet_ros2/ ./src/pybullet_ros2/
 RUN su ${USER} -c /bin/bash -c "source /opt/ros/${ROS_VERSION}/setup.bash; colcon build --symlink-install"
 
