@@ -45,6 +45,7 @@ class TorqueControl:
         self._robot = robot
 
         self._last_command_type = ""
+        self._force_commands = [100] * len(self._robot.joint_indices)
 
         # setup subscribers
         self._subscriber = TorControl(node, self._robot.namespace)
@@ -60,7 +61,12 @@ class TorqueControl:
                 self._pb.setJointMotorControlArray(self._robot.id, self._robot.joint_indices, self._pb.VELOCITY_CONTROL,
                                                    forces=[0] * len(self._robot.joint_indices))
             control_params["controlMode"] = self._pb.TORQUE_CONTROL
-            control_params["forces"] = self._subscriber.get_last_cmd()
+            control_params["forces"] = self._robot.compensate_gravity(self._subscriber.get_last_cmd())
+        elif self._last_command_type == "effort" and not self._subscriber.get_is_data_available():
+            self._last_command_type = ""
+            control_params["controlMode"] = self._pb.VELOCITY_CONTROL
+            control_params["targetVelocities"] = [0] * len(self._robot.joint_indices)
+            control_params["forces"] = self._force_commands
 
         if "controlMode" in control_params.keys():
             self._pb.setJointMotorControlArray(**control_params)

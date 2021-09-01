@@ -82,6 +82,8 @@ class PyBulletRosWrapper(rclpy.node.Node):
                 # store objects in member variable for future use
                 self._plugins.append(obj)
         self.get_logger().info("[PyBulletRosWrapper::init] PyBullet ROS wrapper initialized.")
+        self._pb.setGravity(0, 0, -9.81)
+        self._pb.loadURDF('plane.urdf')
 
     def _start_pybullet_ros_wrapper_sequential(self):
         """

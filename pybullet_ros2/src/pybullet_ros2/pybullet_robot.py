@@ -91,7 +91,7 @@ class PyBulletRobot(PyBulletRobotDescription):
         :rtype: list of float
         """
         if link_id not in self._all_joint_indices:
-            rospy.logerr("[PyBulletRobotDescription::get_link_state] Desired link ID does not exist!")
+            print("[PyBulletRobotDescription::get_link_state] Desired link ID does not exist!")
             return False
         else:
             link_state = pb.getLinkState(self._id, link_id, computeLinkVelocity=1, physicsClientId=self._uid)
@@ -105,3 +105,16 @@ class PyBulletRobot(PyBulletRobotDescription):
         :rtype: list of float
         """
         return pb.getBasePositionAndOrientation(self._id, self._uid) + pb.getBaseVelocity(self._id, self._uid)
+
+    def compensate_gravity(self, raw_command):
+        """
+        Compensate gravity for a given command.
+        :param raw_command: Raw command
+        :type raw_command: list of float
+        :return: Gravity compensated command
+        :rtype: list of float
+        """
+        joint_positions, joint_velocities = self.get_joint_state()[0:2]
+        gravity_compensation = pb.calculateInverseDynamics(self._id, joint_positions, joint_velocities,
+                                                           [0] * len(self.joint_indices), self._uid)
+        return [a + b for a, b in zip(raw_command, gravity_compensation)]
