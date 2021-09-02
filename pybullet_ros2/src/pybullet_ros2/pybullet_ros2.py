@@ -9,8 +9,8 @@ from rcl_interfaces.srv import GetParameters
 from ament_index_python import get_package_share_directory
 
 from .function_exec_manager import FuncExecManager
-from .pybullet_robot_ros import PyBulletRobotRos
-from .pybullet_sim import PyBulletSim
+from .pybullet_robot_ros import PyBulletRobotROS
+from .pybullet_sim_ros import PyBulletSimROS
 import yaml
 
 
@@ -31,7 +31,7 @@ class PyBulletRosWrapper(rclpy.node.Node):
             ])
         self._pb = importlib.import_module("pybullet")
 
-        self._simulation = PyBulletSim(self)
+        self._simulation = PyBulletSimROS(self)
         #     # create object of environment class for later use
         #     env_plugin = rospy.get_param("~environment", "environment")  # default : plugins/environment.py
         #     plugin_import_prefix = rospy.get_param("~plugin_import_prefix", "pybullet_ros.plugins")
@@ -65,7 +65,7 @@ class PyBulletRosWrapper(rclpy.node.Node):
             robot_config[robot_name]["urdf"]["full_path"] = os.path.join(
                 get_package_share_directory(robot_config[robot_name]["urdf"]["package"]),
                 robot_config[robot_name]["urdf"]["path"])
-            robot = PyBulletRobotRos(name=robot_name, sim_uid=self._simulation.uid,
+            robot = PyBulletRobotROS(name=robot_name, sim_uid=self._simulation.uid,
                                      robot_config=robot_config[robot_name])
             self._robots[robot_name] = robot
 

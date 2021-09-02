@@ -1,3 +1,4 @@
+from .pybullet_sim import PyBulletSim
 from .pybullet_robot_description import PyBulletRobotDescription
 from .pybullet_robot_description import test_valid_robot_name
 from .pybullet_robot import PyBulletRobot

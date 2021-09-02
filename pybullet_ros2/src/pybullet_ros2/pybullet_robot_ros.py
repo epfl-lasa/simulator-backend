@@ -4,7 +4,7 @@ from pybullet_simulation import PyBulletRobot
 from pybullet_simulation import test_valid_robot_name
 
 
-class PyBulletRobotRos(PyBulletRobot):
+class PyBulletRobotROS(PyBulletRobot):
     """
     PyBulletRobotRos wrapping PyBulletRobot for ROS usage.
     """
