@@ -35,8 +35,15 @@ class PyBulletRobot(PyBulletRobotDescription):
         :type log_warn: T
         :type log_err: T
         """
-        # assert isinstance(name, str), "[PyBulletRobot::init] Parameter 'name' has an incorrect type."
-        # assert isinstance(uid, int), "[PyBulletRobot::init] Parameter 'uid' has an incorrect type."
+        assert isinstance(sim_uid, int), "[PyBulletRobotDescription::init] Argument 'sim_uid' has an incorrect type."
+        assert isinstance(name, str), "[PyBulletRobotDescription::init] Argument 'name' has an incorrect type."
+        assert isinstance(urdf_path,
+                          str), "[PyBulletRobotDescription::init] Argument 'urdf_path' has an incorrect type."
+        assert isinstance(fixed_base,
+                          bool), "[PyBulletRobotDescription::init] Argument 'fixed_base' has an incorrect type."
+        assert isinstance(use_inertia_from_file,
+                          bool), "[PyBulletRobotDescription::init] Argument 'use_inertia_from_file' has an incorrect type."
+        
         self._sim_uid = sim_uid
         super().__init__(self._sim_uid, name, urdf_path, fixed_base, use_inertia_from_file)
 

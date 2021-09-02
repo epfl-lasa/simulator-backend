@@ -39,6 +39,15 @@ class PyBulletRobotDescription(object):
         :type fixed_base: bool
         :type use_inertia_from_file: bool
         """
+        assert isinstance(sim_uid, int), "[PyBulletRobotDescription::init] Argument 'sim_uid' has an incorrect type."
+        assert isinstance(name, str), "[PyBulletRobotDescription::init] Argument 'name' has an incorrect type."
+        assert isinstance(urdf_path,
+                          str), "[PyBulletRobotDescription::init] Argument 'urdf_path' has an incorrect type."
+        assert isinstance(fixed_base,
+                          bool), "[PyBulletRobotDescription::init] Argument 'fixed_base' has an incorrect type."
+        assert isinstance(use_inertia_from_file,
+                          bool), "[PyBulletRobotDescription::init] Argument 'use_inertia_from_file' has an incorrect type."
+
         self._initialized = False
         self._sim_uid = sim_uid
         self._name = name
