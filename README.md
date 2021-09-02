@@ -2,9 +2,8 @@
 
 ## Usage instructions
 
-Make sure to clone [aica-technology/docker-images](https://github.com/aica-technology/docker-images) before you start,
-as the instructions below rely on scripts from this repository. In either case, use the commands below to set everything
-up correctly.
+Make sure to clone [aica-technology/docker-images](https://github.com/aica-technology/docker-images) and install the
+scripts before you start, as the instructions below rely on those scripts.
 
 ### Build the image
 
@@ -17,15 +16,13 @@ bash build.sh
 ### Run image interactively
 
 ```bash
-cd path/to/aica-technology/docker-images/scripts
-bash run_interactive.sh aica-technology/simulator-backend -u ros2
+aica-docker interactive aica-technology/simulator-backend -u ros2
 ```
 
 If you want to connect to the image to have a more terminals, run
 
 ```bash
-cd path/to/aica-technology/docker-images/scripts
-bash connect.sh aica-technology-simulator-backend-runtime -u ros2
+aica-docker connect aica-technology-simulator-backend-runtime -u ros2
 ```
 
 If you create files within the container that are relevant (for example RViz config files), copy them to the host with
@@ -39,15 +36,13 @@ docker cp aica-technology-simulator-backend-runtime:/home/<user>/path/within/con
 Run the image as server with port number 7777
 
 ```bash
-cd path/to/aica-technology/docker-images/scripts
-bash server.sh aica-technology/simulator-backend -p 7777 -u ros2
+aica-docker server aica-technology/simulator-backend -p 7777 -u ros2
 ```
 
 If you want to connect to the image to have a more terminals, run
 
 ```bash
-cd path/to/aica-technology/docker-images/scripts
-bash connect.sh aica-technology-simulator-backend-ssh -u ros2
+aica-docker connect aica-technology-simulator-backend-ssh -u ros2
 ```
 
 If you create files within the container that are relevant (for example RViz config files), copy them to the host with

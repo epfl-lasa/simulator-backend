@@ -9,7 +9,7 @@ from rcl_interfaces.srv import GetParameters
 from ament_index_python import get_package_share_directory
 
 from .function_exec_manager import FuncExecManager
-from .pybullet_robot import PyBulletRobot
+from .pybullet_robot_ros import PyBulletRobotRos
 from .pybullet_sim import PyBulletSim
 import yaml
 
@@ -65,7 +65,8 @@ class PyBulletRosWrapper(rclpy.node.Node):
             robot_config[robot_name]["urdf"]["full_path"] = os.path.join(
                 get_package_share_directory(robot_config[robot_name]["urdf"]["package"]),
                 robot_config[robot_name]["urdf"]["path"])
-            robot = PyBulletRobot(name=robot_name, robot_config=robot_config[robot_name], uid=self._simulation.uid)
+            robot = PyBulletRobotRos(name=robot_name, sim_uid=self._simulation.uid,
+                                     robot_config=robot_config[robot_name])
             self._robots[robot_name] = robot
 
             # import plugins dynamically
