@@ -14,7 +14,7 @@ RUN sudo pip3 install pybullet pyyaml
 WORKDIR /tmp
 RUN git clone -b develop --single-branch https://github.com/epfl-lasa/control_libraries
 RUN bash control_libraries/source/install.sh --no-dynamical-systems --no-controllers --no-robot-model
-RUN pip3 install control_libraries/python
+RUN sudo pip3 install control_libraries/python
 
 RUN mkdir -p ${HOME}/lib
 WORKDIR ${HOME}/lib

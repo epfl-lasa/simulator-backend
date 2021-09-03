@@ -2,10 +2,10 @@ import os
 
 import rclpy
 from std_srvs.srv import Trigger
-from pybullet_simulation import PyBulletSim
+from pybullet_simulation import Simulation
 
 
-class PyBulletSimROS(PyBulletSim):
+class PyBulletSimROS(Simulation):
     """
     PyBulletSimROS wrapping PybulletSim for ROS usage and adding services.
     """

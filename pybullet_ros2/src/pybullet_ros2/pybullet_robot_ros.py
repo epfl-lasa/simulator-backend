@@ -1,10 +1,10 @@
 from sensor_msgs.msg import JointState
 
-from pybullet_simulation import PyBulletRobot
+from pybullet_simulation import Robot
 from pybullet_simulation import test_valid_robot_name
 
 
-class PyBulletRobotROS(PyBulletRobot):
+class PyBulletRobotROS(Robot):
     """
     PyBulletRobotRos wrapping PyBulletRobot for ROS usage.
     """
@@ -42,9 +42,12 @@ class PyBulletRobotROS(PyBulletRobot):
         return self._namespace
 
     def get_joint_state_msg(self):
+        joint_state = self.get_joint_state()
         msg = JointState()
-        msg.name = [self.all_joint_names[i] for i in self.joint_indices]
-        msg.position, msg.velocity, _, msg.effort = self.get_joint_state()
+        msg.name = joint_state.get_names()
+        msg.position = joint_state.get_positions().tolist()
+        msg.velocity = joint_state.get_velocities().tolist()
+        msg.effort = joint_state.get_torques().tolist()
         return msg
 
     @staticmethod
