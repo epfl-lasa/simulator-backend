@@ -4,12 +4,13 @@ import pybullet as pb
 import pybullet_data as pb_data
 
 
-class PyBulletSim(object):
+class Simulation(object):
     """
     The Simulation class creates the PyBullet physics server and optionally a GUI.
     Available methods (for usage, see documentation at function definition):
         - uid
         - is_alive
+        - is_paused
         - step
         - add_search_path
         - add_pybullet_path
@@ -31,20 +32,20 @@ class PyBulletSim(object):
         :type log_warn: T
         :type log_err: T
         """
-        assert isinstance(gui, bool), "[PyBulletSim::init] Argument 'gui' has an incorrect type."
-        assert isinstance(gui_options, str), "[PyBulletSim::init] Argument 'gui_options' has an incorrect type."
-        assert isinstance(start_paused, bool), "[PyBulletSim::init] Argument 'start_paused' has an incorrect type."
+        assert isinstance(gui, bool), "[Simulation::init] Argument 'gui' has an incorrect type."
+        assert isinstance(gui_options, str), "[Simulation::init] Argument 'gui_options' has an incorrect type."
+        assert isinstance(start_paused, bool), "[Simulation::init] Argument 'start_paused' has an incorrect type."
 
         self._log_info = log_info
         self._log_warn = log_warn
         self._log_err = log_err
 
         if gui:
-            self._log_info("[PyBulletSim::init] Running PyBullet with GUI")
+            self._log_info("[Simulation::init] Running PyBullet with GUI")
             self._log_info("-------------------------")
             self._uid = pb.connect(pb.GUI, options=gui_options)
         else:
-            self._log_info("[PyBulletSim::init] Running PyBullet without GUI")
+            self._log_info("[Simulation::init] Running PyBullet without GUI")
             self._log_info("-------------------------")
             self._uid = pb.connect(pb.DIRECT)
 
@@ -88,14 +89,14 @@ class PyBulletSim(object):
         :return: isdir: Boolean if action was successful
         :rtype: isdir: bool
         """
-        assert isinstance(path, str), "[PyBulletSim::add_search_path] Parameter 'path' has an incorrect type."
+        assert isinstance(path, str), "[Simulation::add_search_path] Parameter 'path' has an incorrect type."
         if os.path.isdir(path):
             pb.setAdditionalSearchPath(path)
-            self._log_info("[PyBulletSim::add_search_path] Added {} to PyBullet path.".format(path))
+            self._log_info("[Simulation::add_search_path] Added {} to PyBullet path.".format(path))
             return True
         else:
             self._log_err(
-                "[PyBulletSim::add_search_path] Error adding to PyBullet path! {} not a directory.".format(path))
+                "[Simulation::add_search_path] Error adding to PyBullet path! {} not a directory.".format(path))
             return False
 
     @staticmethod

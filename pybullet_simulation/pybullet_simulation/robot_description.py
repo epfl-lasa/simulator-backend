@@ -3,9 +3,9 @@ import re
 import pybullet as pb
 
 
-class PyBulletRobotDescription(object):
+class RobotDescription(object):
     """
-    PyBulletRobotDescription for a robotic manipulator.
+    RobotDescription for a robotic manipulator.
     This is a collection of methods that gather and store information from the robot description urdf
     such that this information only has to be requested from the pybullet physics engine once.
     Available methods (for usage, see documentation at function definition):
@@ -16,17 +16,20 @@ class PyBulletRobotDescription(object):
         - all_joints_dict
         - link_names
         - link_dict
+        - link_indices
         - get_joint_index_by_name
         - get_link_index_by_name
+        - joint_names
         - nb_joints
         - joint_indices
         - nb_fixed_joints
         - fixed_joint_indices
+        - joint_limits
     """
 
     def __init__(self, sim_uid, name, urdf_path, fixed_base=True, use_inertia_from_file=True):
         """
-        Constructor of the Robot Description class. Gathers information from the robot urdf description
+        Constructor of the RobotDescription class. Gathers information from the robot urdf description
         regarding joints and links and implements simple getter functions for robot information.
         :param sim_uid: ID of the physics client
         :param name: Name of the robot
@@ -39,14 +42,14 @@ class PyBulletRobotDescription(object):
         :type fixed_base: bool
         :type use_inertia_from_file: bool
         """
-        assert isinstance(sim_uid, int), "[PyBulletRobotDescription::init] Argument 'sim_uid' has an incorrect type."
-        assert isinstance(name, str), "[PyBulletRobotDescription::init] Argument 'name' has an incorrect type."
+        assert isinstance(sim_uid, int), "[RobotDescription::init] Argument 'sim_uid' has an incorrect type."
+        assert isinstance(name, str), "[RobotDescription::init] Argument 'name' has an incorrect type."
         assert isinstance(urdf_path,
-                          str), "[PyBulletRobotDescription::init] Argument 'urdf_path' has an incorrect type."
+                          str), "[RobotDescription::init] Argument 'urdf_path' has an incorrect type."
         assert isinstance(fixed_base,
-                          bool), "[PyBulletRobotDescription::init] Argument 'fixed_base' has an incorrect type."
+                          bool), "[RobotDescription::init] Argument 'fixed_base' has an incorrect type."
         assert isinstance(use_inertia_from_file,
-                          bool), "[PyBulletRobotDescription::init] Argument 'use_inertia_from_file' has an incorrect type."
+                          bool), "[RobotDescription::init] Argument 'use_inertia_from_file' has an incorrect type."
 
         self._initialized = False
         self._sim_uid = sim_uid
@@ -141,7 +144,7 @@ class PyBulletRobotDescription(object):
     @property
     def link_names(self):
         """
-        Get list with the names of all link in the robot description.
+        Get list with the names of all links in the robot description.
         :return: List of all link names in the robot description
         :rtype: list of str
         """
@@ -155,6 +158,15 @@ class PyBulletRobotDescription(object):
         :rtype: dict[str, int]
         """
         return self._all_link_dict
+
+    @property
+    def link_indices(self):
+        """
+        Get list with the indices of all links in the robot description.
+        :return: List of all link indices in the robot description
+        :rtype: list of int
+        """
+        return self._all_joint_indices
 
     def _get_joint_info(self):
         """
@@ -183,7 +195,7 @@ class PyBulletRobotDescription(object):
         if joint_name in self._all_joint_dict:
             return self._all_joint_dict[joint_name]
         else:
-            raise Exception("[PyBulletRobotDescription::get_link_index_by_name] Joint name does not exist!")
+            raise Exception("[RobotDescription::get_link_index_by_name] Joint name does not exist!")
 
     def get_link_index_by_name(self, link_name):
         """
@@ -196,7 +208,16 @@ class PyBulletRobotDescription(object):
         if link_name in self._all_link_dict:
             return self._all_link_dict[link_name]
         else:
-            raise Exception("[PyBulletRobotDescription::get_link_index_by_name] Link name does not exist!")
+            raise Exception("[RobotDescription::get_link_index_by_name] Link name does not exist!")
+
+    @property
+    def joint_names(self):
+        """
+        Get list with the names of all links in the robot description.
+        :return: List of all link names in the robot description
+        :rtype: list of str
+        """
+        return [self._all_joint_names[i] for i in self.joint_indices]
 
     @property
     def nb_joints(self):
@@ -283,5 +304,5 @@ def test_valid_robot_name(name):
     allowed = re.compile("[a-zA-Z0-9_]*$")
     if not allowed.match(name):
         raise Exception(
-            "[PyBulletRobotDescription::test_valid name] Invalid name '{}' for a PyBulletRobot. Allowed characters are [a-zA-Z0-9_]. " +
-            "Exiting now.".format(name))
+            "[RobotDescription::test_valid name] Invalid name '{}' for a PyBulletRobot. "
+            "Allowed characters are [a-zA-Z0-9_]. Exiting now.".format(name))
