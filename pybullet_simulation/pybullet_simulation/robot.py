@@ -17,6 +17,7 @@ class Robot(RobotDescription):
         - get_base_state
         - get_jacobian
         - get_inertia
+        - compensate_gravity
     """
 
     def __init__(self, sim_uid, name, urdf_path, fixed_base=True, use_inertia_from_file=True, log_info=print,
@@ -153,3 +154,17 @@ class Robot(RobotDescription):
             return False
         else:
             return np.array(pb.calculateMassMatrix(self._id, joint_positions.tolist()))
+
+    def compensate_gravity(self, raw_command):
+        """
+        Compensate gravity for a given command.
+        :param raw_command: Raw command
+        :type raw_command: list of float
+        :return: Gravity compensated command
+        :rtype: list of float
+        """
+        joint_state = self.get_joint_state()
+        gravity_compensation = pb.calculateInverseDynamics(self._id, joint_state.get_positions().tolist(),
+                                                           joint_state.get_velocities().tolist(),
+                                                           [0] * len(self.joint_indices), self._sim_uid)
+        return [a + b for a, b in zip(raw_command, gravity_compensation)]
