@@ -53,6 +53,7 @@ class Control:
         # the max force to apply to the joint, used in velocity control
         # max_effort = rospy.get_param("~max_effort", 100.0) # TODO
         self._force_commands = [100] * len(self._robot.joint_indices)
+        self._last_command_type = ""
 
         # setup subscribers
         self._pc_subscriber = PosVelEffControl("position", node, self._robot.namespace)
@@ -64,18 +65,29 @@ class Control:
         Execute the plugin. This function is called from main update loop in the pybullet ros node.
         """
         control_params = {"bodyUniqueId": self._robot.id, "jointIndices": self._robot.joint_indices}
+        if self._last_command_type == "effort" and not self._ec_subscriber.get_is_data_available():
+            self._last_command_type = ""
+            control_params["controlMode"] = self._pb.VELOCITY_CONTROL
+            control_params["targetVelocities"] = [0] * len(self._robot.joint_indices)
+            control_params["forces"] = self._force_commands
         if self._pc_subscriber.get_is_data_available():
+            self._last_command_type = "position"
             control_params["controlMode"] = self._pb.POSITION_CONTROL
             control_params["targetPositions"] = self._pc_subscriber.get_last_cmd()
             control_params["forces"] = self._force_commands
         if self._vc_subscriber.get_is_data_available():
+            self._last_command_type = "velocity"
             control_params["controlMode"] = self._pb.VELOCITY_CONTROL
             control_params["targetVelocities"] = self._vc_subscriber.get_last_cmd()
             control_params["forces"] = self._force_commands
         if self._ec_subscriber.get_is_data_available():
-            pass
-            # control_params["controlMode"] = self._pb.TORQUE_CONTROL
-            # control_params["forces"] = self._ec_subscriber.get_last_cmd()
+            if self._last_command_type != "effort":
+                self._last_command_type = "effort"
+                self._pb.setJointMotorControlArray(self._robot.id, self._robot.joint_indices,
+                                                   self._pb.VELOCITY_CONTROL,
+                                                   forces=[0] * len(self._robot.joint_indices))
+            control_params["controlMode"] = self._pb.TORQUE_CONTROL
+            control_params["forces"] = self._robot.compensate_gravity(self._ec_subscriber.get_last_cmd())
 
         if "controlMode" in control_params.keys():
             self._pb.setJointMotorControlArray(**control_params)
