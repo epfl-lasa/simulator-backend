@@ -13,10 +13,10 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         "control-libraries==3.1.0",
-        "numpy==1.20.2",
-        "numba==0.54.0",
-        "scipy==1.7.1",
-        "pybullet==3.1.7"
+        "numpy>=1.20.2",
+        "numba>=0.54.0",
+        "scipy>=1.7.1",
+        "pybullet>=3.1.7"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
