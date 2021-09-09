@@ -12,7 +12,7 @@ RUN sudo pip3 install pybullet pyyaml
 
 RUN mkdir -p ${HOME}/lib
 WORKDIR ${HOME}/lib
-COPY --chown=${USER} ./pybullet_simulation ./pybullet_simulation
+COPY --chown=${USER} ../pybullet_simulation ./pybullet_simulation
 RUN pip3 install --editable ./pybullet_simulation
 
 WORKDIR ${HOME}/ros2_ws/

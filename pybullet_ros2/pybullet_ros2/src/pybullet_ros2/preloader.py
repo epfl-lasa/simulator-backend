@@ -55,7 +55,7 @@ def main():
             parameters=[{
                 "robot_description": Command(
                     ["xacro ", os.path.join(get_package_share_directory(yaml_content[robot]["urdf"]["package"]),
-                                            yaml_content[robot]["urdf"]["path"]), " arm_id:=", robot, " xyz:='",
+                                            yaml_content[robot]["urdf"]["path"]), " prefix:=_", robot, " xyz:='",
                      " ".join(str(pos) for pos in yaml_content[robot]["position"]), "' rpy:='",
                      " ".join(str(pos) for pos in yaml_content[robot]["rpy"]), "'"])
             }],
