@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-ROS_VERSION=galactic
+ROS_VERSION=foxy
 
 IMAGE_NAME=aica-technology/ros2-simulator
-IMAGE_TAG=latest
+IMAGE_TAG="${ROS_VERSION}"
 
 # BUILD
 BUILD_FLAGS=()
@@ -16,7 +16,7 @@ done
 shift "$(( OPTIND - 1 ))"
 
 BUILD_FLAGS+=(--build-arg ROS_VERSION="${ROS_VERSION}")
-BUILD_FLAGS+=(-t "${IMAGE_NAME}":"${IMAGE_TAG}")
+BUILD_FLAGS+=(-t "${IMAGE_NAME}:${IMAGE_TAG}")
 
 docker pull ghcr.io/aica-technology/ros2-control-libraries:"${ROS_VERSION}"
 DOCKER_BUILDKIT=1 docker build "${BUILD_FLAGS[@]}" --file ./Dockerfile .. || exit
