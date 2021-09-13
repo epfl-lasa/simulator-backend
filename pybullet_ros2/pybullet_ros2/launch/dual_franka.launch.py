@@ -23,7 +23,7 @@ def generate_launch_description():
     start_paused = DeclareLaunchArgument("start_paused", default_value=TextSubstitution(text="False"))
     loop_rate = DeclareLaunchArgument("loop_rate", default_value="500.0")
     parallel_plugin_execution = DeclareLaunchArgument("parallel_plugin_execution",
-                                                      default_value=TextSubstitution(text="True"))
+                                                      default_value=TextSubstitution(text="False"))
     # use_deformable_world = DeclareLaunchArgument("use_deformable_world", default_value=TextSubstitution(text="False"))
 
     preloader_node = Node(

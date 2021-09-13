@@ -1,54 +1,68 @@
-import os
+import re
 
 import pybullet as pb
 
 
-class PyBulletRobotDescription(object):
+class RobotDescription(object):
     """
-    PyBulletRobotDescription for a robotic manipulator.
+    RobotDescription for a robotic manipulator.
     This is a collection of methods that gather and store information from the robot description urdf
     such that this information only has to be requested from the pybullet physics engine once.
     Available methods (for usage, see documentation at function definition):
         - is_initialized
         - id
-        - namespace
+        - name
         - all_joint_names
         - all_joints_dict
         - link_names
         - link_dict
+        - link_indices
         - get_joint_index_by_name
         - get_link_index_by_name
+        - joint_names
         - nb_joints
         - joint_indices
         - nb_fixed_joints
         - fixed_joint_indices
+        - joint_limits
     """
 
-    def __init__(self, name, robot_config, uid):
+    def __init__(self, sim_uid, name, urdf_path, fixed_base=True, use_inertia_from_file=True):
         """
-        Constructor of the Robot Description class. Gathers information from the robot urdf description
+        Constructor of the RobotDescription class. Gathers information from the robot urdf description
         regarding joints and links and implements simple getter functions for robot information.
-        :param name: name of the robot
-        :param uid: server id of pybullet
+        :param sim_uid: ID of the physics client
+        :param name: Name of the robot
+        :param urdf_path: Absolute path of the robot urdf file
+        :param fixed_base: Use fixed base robot
+        :param use_inertia_from_file: Use inertial tags from urdf file
+        :type sim_uid: int
         :type name: str
-        :type uid: int
+        :type urdf_path: str
+        :type fixed_base: bool
+        :type use_inertia_from_file: bool
         """
-        self._initialized = False
-        self._namespace = "/" + name + "/"
-        self._uid = uid
+        assert isinstance(sim_uid, int), "[RobotDescription::init] Argument 'sim_uid' has an incorrect type."
+        assert isinstance(name, str), "[RobotDescription::init] Argument 'name' has an incorrect type."
+        assert isinstance(urdf_path,
+                          str), "[RobotDescription::init] Argument 'urdf_path' has an incorrect type."
+        assert isinstance(fixed_base,
+                          bool), "[RobotDescription::init] Argument 'fixed_base' has an incorrect type."
+        assert isinstance(use_inertia_from_file,
+                          bool), "[RobotDescription::init] Argument 'use_inertia_from_file' has an incorrect type."
 
-        urdf_path = self._get_urdf_path(name, robot_config["urdf"])
-        if urdf_path is None:
-            return
+        self._initialized = False
+        self._sim_uid = sim_uid
+        self._name = name
 
         # load robot from URDF model, user decides if inertia is computed automatically by pybullet or custom
         # self collision is on by default
-        if robot_config["use_inertia_from_file"]:
+        if use_inertia_from_file:
             urdf_flags = pb.URDF_USE_INERTIA_FROM_FILE | pb.URDF_USE_SELF_COLLISION
         else:
             urdf_flags = pb.URDF_USE_SELF_COLLISION
-        self._id = pb.loadURDF(urdf_path, useFixedBase=robot_config["fixed_base"], flags=urdf_flags,
-                               physicsClientId=self._uid)
+        self._id = pb.loadURDF(urdf_path, useFixedBase=fixed_base, flags=urdf_flags,
+                               physicsClientId=self._sim_uid)
 
         # get joint and link info
         self._all_joint_info = self._get_joint_info()
@@ -62,13 +76,15 @@ class PyBulletRobotDescription(object):
         self._movable_joint_indices = self._find_movable_joints()
         self._fixed_joint_indices = self._find_fixed_joints()
 
-        self._joint_lower_position_limits = [pb.getJointInfo(self._id, joint, physicsClientId=self._uid)[8] for joint in
+        self._joint_lower_position_limits = [pb.getJointInfo(self._id, joint, physicsClientId=self._sim_uid)[8] for
+                                             joint in
                                              self._movable_joint_indices]
-        self._joint_upper_position_limits = [pb.getJointInfo(self._id, joint, physicsClientId=self._uid)[9] for joint in
+        self._joint_upper_position_limits = [pb.getJointInfo(self._id, joint, physicsClientId=self._sim_uid)[9] for
+                                             joint in
                                              self._movable_joint_indices]
-        self._joint_velocity_limits = [pb.getJointInfo(self._id, joint, physicsClientId=self._uid)[11] for joint in
+        self._joint_velocity_limits = [pb.getJointInfo(self._id, joint, physicsClientId=self._sim_uid)[11] for joint in
                                        self._movable_joint_indices]
-        self._joint_effort_limits = [pb.getJointInfo(self._id, joint, physicsClientId=self._uid)[10] for joint in
+        self._joint_effort_limits = [pb.getJointInfo(self._id, joint, physicsClientId=self._sim_uid)[10] for joint in
                                      self._movable_joint_indices]
 
         self._joint_limits = [{'pos_lower': x[0], 'pos_upper': x[1], 'velocity': x[2], 'effort': x[3]}
@@ -100,12 +116,12 @@ class PyBulletRobotDescription(object):
         return self._id
 
     @property
-    def namespace(self):
+    def name(self):
         """
-        Getter of the robot namespace.
-        :rtype: str
+        Getter of the robot ID.
+        :rtype: int
         """
-        return self._namespace
+        return self._name
 
     @property
     def all_joint_names(self):
@@ -128,7 +144,7 @@ class PyBulletRobotDescription(object):
     @property
     def link_names(self):
         """
-        Get list with the names of all link in the robot description.
+        Get list with the names of all links in the robot description.
         :return: List of all link names in the robot description
         :rtype: list of str
         """
@@ -143,21 +159,28 @@ class PyBulletRobotDescription(object):
         """
         return self._all_link_dict
 
+    @property
+    def link_indices(self):
+        """
+        Get list with the indices of all links in the robot description.
+        :return: List of all link indices in the robot description
+        :rtype: list of int
+        """
+        return self._all_joint_indices
+
     def _get_joint_info(self):
         """
         Get a dicts with all the information obtained from pybullet getJointInfo method for all joints.
         :return: getJointInfo() method return values from pybullet for all joints
         :rtype: list of dict
         """
-        attribute_list = ['jointIndex', 'jointName', 'jointType',
-                          'qIndex', 'uIndex', 'flags',
-                          'jointDamping', 'jointFriction', 'jointLowerLimit',
-                          'jointUpperLimit', 'jointMaxForce', 'jointMaxVelocity', 'linkName',
-                          'jointAxis', 'parentFramePos', 'parentFrameOrn', 'parentIndex']
+        attribute_list = ['jointIndex', 'jointName', 'jointType', 'qIndex', 'uIndex', 'flags', 'jointDamping',
+                          'jointFriction', 'jointLowerLimit', 'jointUpperLimit', 'jointMaxForce', 'jointMaxVelocity',
+                          'linkName', 'jointAxis', 'parentFramePos', 'parentFrameOrn', 'parentIndex']
 
         joint_information = []
-        for idx in range(pb.getNumJoints(self._id, physicsClientId=self._uid)):
-            info = pb.getJointInfo(self._id, idx, physicsClientId=self._uid)
+        for idx in range(pb.getNumJoints(self._id, physicsClientId=self._sim_uid)):
+            info = pb.getJointInfo(self._id, idx, physicsClientId=self._sim_uid)
             joint_information.append(dict(zip(attribute_list, info)))
         return joint_information
 
@@ -172,7 +195,7 @@ class PyBulletRobotDescription(object):
         if joint_name in self._all_joint_dict:
             return self._all_joint_dict[joint_name]
         else:
-            raise Exception("[PyBulletRobotDescription::get_link_index_by_name] Joint name does not exist!")
+            raise Exception("[RobotDescription::get_link_index_by_name] Joint name does not exist!")
 
     def get_link_index_by_name(self, link_name):
         """
@@ -185,7 +208,16 @@ class PyBulletRobotDescription(object):
         if link_name in self._all_link_dict:
             return self._all_link_dict[link_name]
         else:
-            raise Exception("[PyBulletRobotDescription::get_link_index_by_name] Link name does not exist!")
+            raise Exception("[RobotDescription::get_link_index_by_name] Link name does not exist!")
+
+    @property
+    def joint_names(self):
+        """
+        Get list with the names of all links in the robot description.
+        :return: List of all link names in the robot description
+        :rtype: list of str
+        """
+        return [self._all_joint_names[i] for i in self.joint_indices]
 
     @property
     def nb_joints(self):
@@ -240,8 +272,7 @@ class PyBulletRobotDescription(object):
         """
         movable_joints = []
         for i in self._all_joint_indices:
-            joint_info = pb.getJointInfo(
-                self._id, i, physicsClientId=self._uid)
+            joint_info = pb.getJointInfo(self._id, i, physicsClientId=self._sim_uid)
             # all movable joints have type bigger than 0, -1 is a fixed joint
             if joint_info[3] > -1:
                 movable_joints.append(i)
@@ -255,29 +286,23 @@ class PyBulletRobotDescription(object):
         """
         fixed_joints = []
         for i in self._all_joint_indices:
-            joint_info = pb.getJointInfo(
-                self._id, i, physicsClientId=self._uid)
+            joint_info = pb.getJointInfo(self._id, i, physicsClientId=self._sim_uid)
             # all fixed joints have type -1
             if joint_info[3] == -1:
                 fixed_joints.append(i)
         return fixed_joints
 
-    @staticmethod
-    def _get_urdf_path(name, urdf_info):
-        """
-        Get robot urdf path from parameter server and create urdf file from robot_description param, if necessary.
-        Return None if one of the operations failed.
-        :param name: name of the robot
-        :type name: str
-        :rtype: str
-        """
-        urdf_path = urdf_info["full_path"][:-11] + "_" + name + ".urdf"
-        try:
-            with open(urdf_path, 'w') as urdf_file:
-                urdf_file.write(urdf_info["robot_description"])
-            return urdf_path
-        except Exception as ex:
-            print(
-                "[PyBulletRobotDescription::get_robot_urdf_path] Failed to create urdf file from param '{}robot_description', " +
-                "cannot write file, exiting now: {}".format(name, ex))
-            return None
+
+def test_valid_robot_name(name):
+    """
+    Get robot urdf path from parameter server and create urdf file from robot_description param, if necessary.
+    Return None if one of the operations failed.
+    :param name: name of the robot
+    :type name: str
+    :rtype: str
+    """
+    allowed = re.compile("[a-zA-Z0-9_]*$")
+    if not allowed.match(name):
+        raise Exception(
+            "[RobotDescription::test_valid name] Invalid name '{}' for a PyBulletRobot. "
+            "Allowed characters are [a-zA-Z0-9_]. Exiting now.".format(name))
