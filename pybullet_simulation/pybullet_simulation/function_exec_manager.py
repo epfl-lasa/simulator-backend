@@ -94,7 +94,7 @@ class FuncExecManager:
         self._late_functions = []
         cycle_unique_id = 0
 
-        while self._stop_condition():
+        while not self._stop_condition():
             cycle_unique_id = cycle_unique_id + 1
             if cycle_unique_id > sys.maxsize:
                 cycle_unique_id = 0
