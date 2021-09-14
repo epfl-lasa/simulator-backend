@@ -5,9 +5,9 @@ import pybullet as pb
 
 class RobotDescription(object):
     """
-    RobotDescription for a robotic manipulator.
+    RobotDescription class for a robotic manipulator.
     This is a collection of methods that gather and store information from the robot description urdf
-    such that this information only has to be requested from the pybullet physics engine once.
+    such that this information only has to be requested from the PyBullet physics engine once.
     Available methods (for usage, see documentation at function definition):
         - is_initialized
         - id
@@ -30,7 +30,8 @@ class RobotDescription(object):
     def __init__(self, sim_uid, name, urdf_path, fixed_base=True, use_inertia_from_file=True):
         """
         Constructor of the RobotDescription class. Gathers information from the robot urdf description
-        regarding joints and links and implements simple getter functions for robot information.
+        regarding joints and links.
+
         :param sim_uid: ID of the physics client
         :param name: Name of the robot
         :param urdf_path: Absolute path of the robot urdf file
@@ -55,7 +56,7 @@ class RobotDescription(object):
         self._sim_uid = sim_uid
         self._name = name
 
-        # load robot from URDF model, user decides if inertia is computed automatically by pybullet or custom
+        # load robot from URDF model, user decides if inertia is computed automatically by PyBullet or custom
         # self collision is on by default
         if use_inertia_from_file:
             urdf_flags = pb.URDF_USE_INERTIA_FROM_FILE | pb.URDF_USE_SELF_COLLISION
@@ -92,6 +93,7 @@ class RobotDescription(object):
                                            self._joint_upper_position_limits,
                                            self._joint_velocity_limits, self._joint_effort_limits)]
 
+        # reset joint position to the mean of upper and lower limit
         for i, joint_id in enumerate(self._movable_joint_indices):
             pb.resetJointState(self._id, joint_id,
                                (self._joint_upper_position_limits[i] + self._joint_lower_position_limits[i]) / 2)
@@ -126,8 +128,9 @@ class RobotDescription(object):
     @property
     def all_joint_names(self):
         """
-        Get list with the names of joints in the robot description.
-        :return: List of all joint names in the robot description
+        Get a list with the names of all joints in the robot description.
+
+        :return: Names of all joints
         :rtype: list of str
         """
         return self._all_joint_names
@@ -135,8 +138,9 @@ class RobotDescription(object):
     @property
     def all_joints_dict(self):
         """
-        Get a dict with all joint names mapping to their joint index in the robot description.
-        :return: Dict with all joint names and corresponding index
+        Get a dictionary with all joint names mapping to their index.
+
+        :return: Names of all joints with corresponding index
         :rtype: dict[str, int]
         """
         return self._all_joint_dict
@@ -144,8 +148,9 @@ class RobotDescription(object):
     @property
     def link_names(self):
         """
-        Get list with the names of all links in the robot description.
-        :return: List of all link names in the robot description
+        Get a list with the names of all links in the robot description.
+
+        :return: Names of all links
         :rtype: list of str
         """
         return self._all_link_names
@@ -153,8 +158,9 @@ class RobotDescription(object):
     @property
     def link_dict(self):
         """
-        Get a dict with all link names mapping to their link index in the robot description.
-        :return: Dict with all link names and corresponding index
+        Get a dictionary with all link names mapping to their index.
+
+        :return: Names of all links with corresponding index
         :rtype: dict[str, int]
         """
         return self._all_link_dict
@@ -163,15 +169,18 @@ class RobotDescription(object):
     def link_indices(self):
         """
         Get list with the indices of all links in the robot description.
-        :return: List of all link indices in the robot description
+        This is equivalent to the list of the indices of all joints.
+
+        :return: Indices of all links
         :rtype: list of int
         """
         return self._all_joint_indices
 
     def _get_joint_info(self):
         """
-        Get a dicts with all the information obtained from pybullet getJointInfo method for all joints.
-        :return: getJointInfo() method return values from pybullet for all joints
+        Get a dictionary with all the information obtained from pybullet.getJointInfo for all joints.
+
+        :return: Joint information for all joints
         :rtype: list of dict
         """
         attribute_list = ['jointIndex', 'jointName', 'jointType', 'qIndex', 'uIndex', 'flags', 'jointDamping',
@@ -186,10 +195,11 @@ class RobotDescription(object):
 
     def get_joint_index_by_name(self, joint_name):
         """
-        Get a joint index by the joint's name.
-        :param joint_name: Name of joint
+        Get the joint index by the joint's name.
+
+        :param joint_name: Name of the joint
         :type joint_name: str
-        :return: Joint index of given joint in robot description.
+        :return: Joint index of given joint
         :rtype: int
         """
         if joint_name in self._all_joint_dict:
@@ -199,10 +209,11 @@ class RobotDescription(object):
 
     def get_link_index_by_name(self, link_name):
         """
-        Get a link index by the link's name.
-        :param link_name: Name of link
+        Get the link index by the link's name.
+
+        :param link_name: Name of the link
         :type link_name: str
-        :return: Link index of given link in robot description.
+        :return: Link index of given link
         :rtype: int
         """
         if link_name in self._all_link_dict:
@@ -213,8 +224,9 @@ class RobotDescription(object):
     @property
     def joint_names(self):
         """
-        Get list with the names of all links in the robot description.
-        :return: List of all link names in the robot description
+        Get list with the names of the movable joints in the robot description.
+
+        :return: List of all joint names
         :rtype: list of str
         """
         return [self._all_joint_names[i] for i in self.joint_indices]
@@ -223,7 +235,8 @@ class RobotDescription(object):
     def nb_joints(self):
         """
         Get number of movable joints in the robot description.
-        :return: Number of movable joints in the robot description.
+
+        :return: Number of movable joints
         :rtype: int
         """
         return len(self._movable_joint_indices)
@@ -231,8 +244,9 @@ class RobotDescription(object):
     @property
     def joint_indices(self):
         """
-        Get joint indices of all movable joints in the robot description.
-        :return: Indices of all movable joints in the robot description.
+        Get joint indices of the movable joints in the robot description.
+
+        :return: Indices of all movable joints
         :rtype: list of int
         """
         return self._movable_joint_indices
@@ -241,7 +255,8 @@ class RobotDescription(object):
     def nb_fixed_joints(self):
         """
         Get number of fixed joints in the robot description.
-        :return: Number of fixed joints in the robot description
+
+        :return: Number of fixed joints
         :rtype: int
         """
         return len(self._fixed_joint_indices)
@@ -249,7 +264,8 @@ class RobotDescription(object):
     @property
     def fixed_joint_indices(self):
         """
-        Get joint indices of all movable joints in the robot description.
+        Get joint indices of the fixed joints in the robot description.
+
         :return: Indices of all movable joints in the robot description.
         :rtype: list of int
         """
@@ -258,16 +274,18 @@ class RobotDescription(object):
     @property
     def joint_limits(self):
         """
-        Get joint position (lower and upper), velocity, and effort limits for all movable joints.
-        :return: Joint position (lower and upper), velocity and effort limits for all movable joints.
+        Get joint position (lower and upper), velocity, and effort limits for the movable joints.
+
+        :return: Joint position (lower and upper), velocity and effort limits of the movable joints
         :rtype: list of dict
         """
         return self._joint_limits
 
     def _find_movable_joints(self):
         """
-        Get joint indices of all movable joints.
-        :return: Indices of all movable joints in the robot description.
+        Get joint indices of the movable joints.
+
+        :return: Indices of the movable joints
         :rtype: list of int
         """
         movable_joints = []
@@ -280,8 +298,9 @@ class RobotDescription(object):
 
     def _find_fixed_joints(self):
         """
-        Get joint indices of all fixed joints.
-        :return: Indices of all movable joints in the robot description.
+        Get joint indices of the fixed joints.
+
+        :return: Indices of the fixed joints
         :rtype: list of int
         """
         fixed_joints = []
@@ -295,14 +314,14 @@ class RobotDescription(object):
 
 def test_valid_robot_name(name):
     """
-    Get robot urdf path from parameter server and create urdf file from robot_description param, if necessary.
-    Return None if one of the operations failed.
+    Make sure that the desired robot name does not contain invalid characters.
+    Raises an exception if the name is not allowed.
+
     :param name: name of the robot
     :type name: str
-    :rtype: str
     """
     allowed = re.compile("[a-zA-Z0-9_]*$")
     if not allowed.match(name):
         raise Exception(
-            "[RobotDescription::test_valid name] Invalid name '{}' for a PyBulletRobot. "
+            "[RobotDescription::test_valid name] Invalid name '{}' for a 'RobotDescription' object. "
             "Allowed characters are [a-zA-Z0-9_]. Exiting now.".format(name))

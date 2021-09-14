@@ -8,8 +8,8 @@ from .robot_description import RobotDescription
 class Robot(RobotDescription):
     """
     Robot extending from RobotDescription.
-    This is a collection of methods that gather 'real-time' information about the robot state and take control over the
-    robot. In other words, these are the methods called (at each time step) in the simulation loop.
+    This is a collection of methods that gather 'real-time' information about the robot state and apply joint commands
+    to the robot. In other words, those are the methods called (at each time step) in the simulation loop.
     Available methods (for usage, see documentation at function definition):
         - get_joint_state
         - get_link_state
@@ -24,14 +24,15 @@ class Robot(RobotDescription):
                  log_warn=print, log_err=print):
         """
         Constructor of the Robot class.
+
         :param sim_uid: ID of the physics client
         :param name: Name of the robot
         :param urdf_path: Absolute path of the robot urdf file
         :param fixed_base: Use fixed base robot
         :param use_inertia_from_file: Use inertial tags from urdf file
-        :param log_info: Function handle for info logging
-        :param log_warn: Function handle for warning logging
-        :param log_err: Function handle for error logging
+        :param log_info: Function for info logging
+        :param log_warn: Function for warning logging
+        :param log_err: Function  for error logging
         :type sim_uid: int
         :type name: str
         :type urdf_path: str
@@ -58,6 +59,7 @@ class Robot(RobotDescription):
     def get_joint_state(self):
         """
         Get joint state of the robot (position, velocity, effort).
+
         :return: The current joint state
         :rtype: JointState
         """
@@ -80,6 +82,7 @@ class Robot(RobotDescription):
     def get_link_state(self, link_id):
         """
         Get state of desired link.
+
         :param link_id: Index of desired link
         :type link_id: int
         :return: State of the link
@@ -99,7 +102,8 @@ class Robot(RobotDescription):
 
     def get_ee_link_state(self):
         """
-        Get state of end effector link.
+        Get state of the end effector link (last index in the robot description).
+
         :return: State of the end effector link
         :rtype: CartesianState
         """
@@ -108,6 +112,7 @@ class Robot(RobotDescription):
     def get_base_state(self):
         """
         Get state of the base.
+
         :return: State of the base
         :rtype: CartesianState
         """
@@ -122,9 +127,12 @@ class Robot(RobotDescription):
 
     def get_jacobian(self, joint_positions):
         """
-        Get state of the base.
-        :return: State of the base
-        :rtype: CartesianState
+        Get the Jacobian of the robot for given joint positions.
+
+        :param joint_positions: Joint positions at which the Jacobian should be evaluated
+        :type joint_positions: np.ndarray
+        :return: Jacobian for the given robot configuration
+        :rtype: Jacobian | bool
         """
         if len(joint_positions) is not self.nb_joints:
             self._log_warn("[Robot::get_jacobian] Invalid number of elements in your input.")
@@ -144,10 +152,11 @@ class Robot(RobotDescription):
     def get_inertia(self, joint_positions):
         """
         Compute the inertia matrix for given joint positions.
-        :param joint_positions: The returned inertia is evaluated at given joint positions
-        :type joint_positions: numpy.ndarray
-        :return: Inertia matrix for current or provided joint configuration, of shape (DOF, DOF), or False if unsuccessful
-        :rtype: numpy.ndarray
+
+        :param joint_positions: Joint positions at which the inertia matrix should be evaluated
+        :type joint_positions: np.ndarray
+        :return: Inertia matrix for the given robot configuration
+        :rtype: numpy.ndarray | bool
         """
         if len(joint_positions) is not self.nb_joints:
             self._log_warn("[Robot::get_inertia] Invalid number of elements in your input.")
@@ -157,8 +166,9 @@ class Robot(RobotDescription):
 
     def compensate_gravity(self, raw_command):
         """
-        Compensate gravity for a given command.
-        :param raw_command: Raw command
+        Compensate gravity for a given effort command.
+
+        :param raw_command: Raw effort command
         :type raw_command: list of float
         :return: Gravity compensated command
         :rtype: list of float

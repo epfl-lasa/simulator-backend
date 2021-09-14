@@ -19,6 +19,7 @@ class Simulation(object):
     def __init__(self, gui=True, gui_options="", start_paused=False, log_info=print, log_warn=print, log_err=print):
         """
         Constructor of the Simulation class. This class creates the PyBullet server / GUI and steps the simulation.
+
         :param gui: Launch a PyBullet GUI
         :param gui_options: Additional options for the PyBullet GUI
         :param start_paused: Start simulation paused
@@ -51,19 +52,22 @@ class Simulation(object):
 
         self._simulation_paused = start_paused
 
+        # add path to PyBullet models (for simple models like the plane and a table)
         self.add_pybullet_path()
 
     @property
     def uid(self):
         """
-        Get UID of physics server
+        Get UID of physics server.
+
         :rtype: int
         """
         return self._uid
 
     def is_alive(self):
         """
-        Check if the physics server is still connected
+        Check if the physics server is still connected.
+
         :rtype: bool
         """
         return pb.isConnected(self._uid)
@@ -71,6 +75,7 @@ class Simulation(object):
     def is_paused(self):
         """
         Check if the simulation if paused.
+
         :rtype: bool
         """
         return self._simulation_paused
@@ -83,11 +88,12 @@ class Simulation(object):
 
     def add_search_path(self, path):
         """
-        Add the specified directory (absolute path) to PyBullets search path for easily adding models from the path.
-        :param path: The absolute path to the directory
+        Add the specified directory (absolute path) to PyBullets search path for adding models from the path.
+
+        :param path: The absolute path to the desired directory
         :type path: str
-        :return: isdir: Boolean if action was successful
-        :rtype: isdir: bool
+        :return: Boolean if action was successful
+        :rtype: bool
         """
         assert isinstance(path, str), "[Simulation::add_search_path] Parameter 'path' has an incorrect type."
         if os.path.isdir(path):
