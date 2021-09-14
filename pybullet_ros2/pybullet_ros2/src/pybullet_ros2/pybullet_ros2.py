@@ -5,13 +5,12 @@ import os
 
 import rclpy
 import rclpy.node
-from rcl_interfaces.srv import GetParameters
+import yaml
 from ament_index_python import get_package_share_directory
+from rcl_interfaces.srv import GetParameters
 
-from .function_exec_manager import FuncExecManager
 from .pybullet_robot_ros import PyBulletRobotROS
 from .pybullet_sim_ros import PyBulletSimROS
-import yaml
 
 
 class PyBulletRosWrapper(rclpy.node.Node):
@@ -100,11 +99,12 @@ class PyBulletRosWrapper(rclpy.node.Node):
         """
         Execute plugins in parallel, however watch their execution time and warn if exceeds the deadline (loop rate)
         """
-        exec_manager_obj = FuncExecManager(self._plugins, rclpy.ok, self._simulation.step,
-                                           self._simulation.is_paused, log_info=self.get_logger().info,
-                                           log_warn=self.get_logger().warn, log_debug=self.get_logger().debug)
-        # start parallel execution of all "execute" class methods in a synchronous way
-        exec_manager_obj.start_synchronous_execution(loop_rate=loop_rate)
+        pass
+        # exec_manager_obj = FuncExecManager(self._plugins, rclpy.ok, self._simulation.step,
+        #                                    self._simulation.is_paused, log_info=self.get_logger().info,
+        #                                    log_warn=self.get_logger().warn, log_debug=self.get_logger().debug)
+        # # start parallel execution of all "execute" class methods in a synchronous way
+        # exec_manager_obj.start_synchronous_execution(loop_rate=loop_rate)
 
     def start_pybullet_ros_wrapper(self):
         loop_rate = self.get_parameter("loop_rate").get_parameter_value().double_value
