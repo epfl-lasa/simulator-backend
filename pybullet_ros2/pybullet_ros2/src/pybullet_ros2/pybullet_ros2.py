@@ -99,12 +99,8 @@ class PyBulletRosWrapper(rclpy.node.Node):
         """
         Execute plugins in parallel, however watch their execution time and warn if exceeds the deadline (loop rate)
         """
+        self.get_logger().warn("Parallel execution of plugins not implemented yet.")
         pass
-        # exec_manager_obj = FuncExecManager(self._plugins, rclpy.ok, self._simulation.step,
-        #                                    self._simulation.is_paused, log_info=self.get_logger().info,
-        #                                    log_warn=self.get_logger().warn, log_debug=self.get_logger().debug)
-        # # start parallel execution of all "execute" class methods in a synchronous way
-        # exec_manager_obj.start_synchronous_execution(loop_rate=loop_rate)
 
     def start_pybullet_ros_wrapper(self):
         loop_rate = self.get_parameter("loop_rate").get_parameter_value().double_value

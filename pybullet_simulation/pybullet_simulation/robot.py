@@ -32,7 +32,7 @@ class Robot(RobotDescription):
         :param use_inertia_from_file: Use inertial tags from urdf file
         :param log_info: Function for info logging
         :param log_warn: Function for warning logging
-        :param log_err: Function  for error logging
+        :param log_err: Function for error logging
         :type sim_uid: int
         :type name: str
         :type urdf_path: str

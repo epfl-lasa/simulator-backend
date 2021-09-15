@@ -88,7 +88,7 @@ class Simulation(object):
 
     def add_search_path(self, path):
         """
-        Add the specified directory (absolute path) to PyBullets search path for adding models from the path.
+        Add the specified directory (absolute path) to PyBullet's search path for adding models from the path.
 
         :param path: The absolute path to the desired directory
         :type path: str

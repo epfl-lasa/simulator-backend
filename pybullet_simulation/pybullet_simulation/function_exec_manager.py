@@ -36,7 +36,7 @@ class FuncExecManager:
     def __init__(self, list_of_plugins, stop_condition, exec_after_each_loop, pause_execution, log_info=print,
                  log_warn=print, log_debug=print):
         """
-        Constructor of the function execution manager.
+        Constructor of a function execution manager.
 
         :param list_of_plugins: List of plugins that have an function called 'execute'
         :param stop_condition: Function that decides if simulation should be stopped or not
