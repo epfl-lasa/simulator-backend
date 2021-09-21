@@ -16,19 +16,19 @@ bash build.sh
 ### Run image interactively
 
 ```bash
-aica-docker interactive aica-technology/ros2-simulator:foxy -u ros2
+aica-docker interactive aica-technology/ros2-simulator:galactic -u ros2
 ```
 
 If you want to connect to the image to have a more terminals, run
 
 ```bash
-aica-docker connect aica-technology-ros2-simulator-foxy-runtime -u ros2
+aica-docker connect aica-technology-ros2-simulator-galactic-runtime -u ros2
 ```
 
 If you create files within the container that are relevant (for example RViz config files), copy them to the host with
 
 ```bash
-docker cp aica-technology-ros2-simulator-foxy-runtime:/home/<user>/path/within/container/ /host/path/target
+docker cp aica-technology-ros2-simulator-galactic-runtime:/home/<user>/path/within/container/ /host/path/target
 ```
 
 ### SSH server for remote development
@@ -36,19 +36,19 @@ docker cp aica-technology-ros2-simulator-foxy-runtime:/home/<user>/path/within/c
 Run the image as server with port number 7771
 
 ```bash
-aica-docker server aica-technology/ros2-simulator:foxy -p 7771 -u ros2
+aica-docker server aica-technology/ros2-simulator:galactic -p 7771 -u ros2
 ```
 
 If you want to connect to the image to have a more terminals, run
 
 ```bash
-aica-docker connect aica-technology-ros2-simulator-foxy-ssh -u ros2
+aica-docker connect aica-technology-ros2-simulator-galactic-ssh -u ros2
 ```
 
 If you create files within the container that are relevant (for example RViz config files), copy them to the host with
 
 ```bash
-docker cp aica-technology-ros2-simulator-foxy-ssh:/home/<user>/path/within/container/ /host/path/target
+docker cp aica-technology-ros2-simulator-galactic-ssh:/home/<user>/path/within/container/ /host/path/target
 ```
 
 ### Pycharm setup for integrated Python development
