@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """
 Position, velocity and effort control for all joints on the robot
 """
