@@ -8,7 +8,7 @@ robots:
     plugins:
       - module: plugins.robot_state_publisher
         class: RobotStatePublisher
-        URI: 127.0.0.1:1601
+        URI: "0.0.0.0:1601"
       - module: plugins.control
         class: Control
-        URI: 127.0.0.1:1602
+        URI: "0.0.0.0:1602"

@@ -6,7 +6,7 @@ class Control:
     def __init__(self, zmq_context, pybullet, robot, **kwargs):
         self._pb = pybullet
         self._robot = robot
-        self._subscriber = network.configure_subscriber(zmq_context, str(kwargs["URI"]))
+        self._subscriber = network.configure_subscriber(zmq_context, str(kwargs["URI"]), False)
 
         self._control_params = {"bodyUniqueId": self._robot.id, "jointIndices": self._robot.joint_indices}
         self._last_command_type = ControlType.UNDEFINED

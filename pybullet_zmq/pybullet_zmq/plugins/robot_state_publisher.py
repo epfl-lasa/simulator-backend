@@ -6,7 +6,7 @@ class RobotStatePublisher:
     def __init__(self, zmq_context, pybullet, robot, **kwargs):
         self._pb = pybullet
         self._robot = robot
-        self._publisher = network.configure_publisher(zmq_context, str(kwargs["URI"]))
+        self._publisher = network.configure_publisher(zmq_context, str(kwargs["URI"]), False)
 
     def execute(self):
         joint_state = self._robot.get_joint_state()
