@@ -9,6 +9,9 @@ WORKDIR ${HOME}/lib
 COPY --chown=${USER} ../pybullet_simulation ./pybullet_simulation
 RUN pip3 install --editable ./pybullet_simulation
 
+COPY --chown={USER} ../network-interfaces/python ./network_interfaces
+RUN sudo pip3 install ./network_interfaces
+
 WORKDIR ${HOME}
 COPY --chown=${USER} ./pybullet_zmq/pybullet_zmq/ ./pybullet_zmq/
 COPY --chown=${USER} ./robot_descriptions ./pybullet_zmq/robot_descriptions

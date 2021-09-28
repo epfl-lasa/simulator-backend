@@ -79,12 +79,14 @@ class Robot(RobotDescription):
         state.set_torques(joint_efforts)
         return state
 
-    def get_link_state(self, link_id):
+    def get_link_state(self, link_id, link_name=""):
         """
         Get state of desired link.
 
         :param link_id: Index of desired link
+        :param link_name: Optional name of the link
         :type link_id: int
+        :type link_name: str
         :return: State of the link
         :rtype: CartesianState
         """
@@ -92,8 +94,12 @@ class Robot(RobotDescription):
             self._log_warn("[Robot::get_link_state] Desired link ID does not exist!")
             return False
         else:
+            if len(link_name):
+                name = link_name
+            else:
+                name = self.link_names[link_id]
             link_state = pb.getLinkState(self._id, link_id, computeLinkVelocity=1, physicsClientId=self._sim_uid)
-            state = CartesianState(self.link_names[link_id], self.name + "_base")
+            state = CartesianState(name, self.name + "_base")
             state.set_position(link_state[4])
             state.set_orientation([link_state[5][-1]] + list(link_state[5][:3]))
             state.set_linear_velocity(link_state[6])
@@ -107,7 +113,7 @@ class Robot(RobotDescription):
         :return: State of the end effector link
         :rtype: CartesianState
         """
-        return self.get_link_state(self._all_joint_indices[-1])
+        return self.get_link_state(self._all_joint_indices[-1], self.name + "_ee")
 
     def get_base_state(self):
         """
@@ -147,7 +153,7 @@ class Robot(RobotDescription):
                                                            physicsClientId=self._sim_uid)
 
         data = np.vstack([np.array(linear_jac), np.array(angular_jac)])
-        return Jacobian(self.name, self.joint_names, self.link_names[-1], data, self.name + "_base")
+        return Jacobian(self.name, self.joint_names, self.name + "_ee", data, self.name + "_base")
 
     def get_inertia(self, joint_positions):
         """
