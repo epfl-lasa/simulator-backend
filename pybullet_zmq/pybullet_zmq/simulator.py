@@ -4,7 +4,6 @@ import time
 
 import yaml
 import zmq
-
 from pybullet_simulation import FuncExecManager
 from pybullet_simulation import Robot
 from pybullet_simulation import Simulation
@@ -71,8 +70,8 @@ class PyBulletZmqWrapper:
         """
         Execute plugins in parallel, however watch their execution time and warn if exceeds the deadline (loop rate)
         """
-        exec_manager_obj = FuncExecManager(self._plugins, lambda: not self._simulation.is_alive(), self._simulation.step,
-                                           self._simulation.is_paused, log_debug=lambda x: None)
+        exec_manager_obj = FuncExecManager(self._plugins, lambda: not self._simulation.is_alive(),
+                                           self._simulation.step, self._simulation.is_paused, log_debug=lambda x: None)
         print("[PyBulletZmqWrapper::start_pybullet_zmq_wrapper_parallel] Starting parallel execution of plugins.")
         # start parallel execution of all "execute" class methods in a synchronous way
         exec_manager_obj.start_synchronous_execution(loop_rate=loop_rate)

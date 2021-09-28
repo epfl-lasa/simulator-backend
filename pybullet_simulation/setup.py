@@ -7,6 +7,8 @@ setuptools.setup(
     name="pybullet_simulation",
     version="0.0",
     description="This package implements a PyBullet simulation",
+    maintainer="Dominic Reber",
+    maintainer_emal="dominic@aica.tech",
     long_description=long_description,
     long_description_content_type="text/markdown",
     # url="https://github.com/pypa/sampleproject",
