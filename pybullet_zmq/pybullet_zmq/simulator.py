@@ -1,3 +1,4 @@
+import argparse
 import importlib
 import os
 import time
@@ -88,10 +89,11 @@ class PyBulletZmqWrapper:
             self._start_pybullet_zmq_wrapper_sequential(self._loop_rate)
 
 
-def main():
-    wrapper = PyBulletZmqWrapper()
-    wrapper.start_pybullet_zmq_wrapper()
-
-
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Start PyBullet simulation with ZMQ interface.")
+    parser.add_argument("-c", "--config_file", type=str, default="franka_config.yaml",
+                        help="Configuration file for the simulation (default: franka_config.yaml)")
+    args = parser.parse_args()
+
+    wrapper = PyBulletZmqWrapper(args.config_file)
+    wrapper.start_pybullet_zmq_wrapper()
