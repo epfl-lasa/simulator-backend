@@ -22,7 +22,7 @@ class PyBulletZmqWrapper:
 
         self._pb = importlib.import_module("pybullet")
         self._zmq_context = zmq.Context(1)
-        self._simulation = Simulation()
+        self._simulation = Simulation(log_info=print, log_warn=self.print_warn, log_err=self.print_err)
 
         with open(config_file, "r") as stream:
             robot_config = yaml.safe_load(stream)
@@ -35,7 +35,8 @@ class PyBulletZmqWrapper:
             robot = Robot(sim_uid=self._simulation.uid, name=robot_name,
                           urdf_path=robot_config["robots"][robot_name]["urdf_path"],
                           fixed_base=robot_config["robots"][robot_name]["fixed_base"],
-                          use_inertia_from_file=robot_config["robots"][robot_name]["use_inertia_from_file"])
+                          use_inertia_from_file=robot_config["robots"][robot_name]["use_inertia_from_file"],
+                          log_info=print, log_warn=self.print_warn, log_err=self.print_err)
             self._robots[robot_name] = robot
 
             # import plugins dynamically
@@ -77,7 +78,8 @@ class PyBulletZmqWrapper:
         Execute plugins in parallel, however watch their execution time and warn if exceeds the deadline (loop rate)
         """
         exec_manager_obj = FuncExecManager(self._plugins, lambda: not self._simulation.is_alive(),
-                                           self._simulation.step, self._simulation.is_paused, log_debug=lambda x: None)
+                                           self._simulation.step, self._simulation.is_paused, log_info=print,
+                                           log_warn=self.print_warn, log_debug=lambda x: None)
         print("[PyBulletZmqWrapper::start_pybullet_zmq_wrapper_parallel] Starting parallel execution of plugins.")
         # start parallel execution of all "execute" class methods in a synchronous way
         exec_manager_obj.start_synchronous_execution(loop_rate=loop_rate)
@@ -87,6 +89,14 @@ class PyBulletZmqWrapper:
             self._start_pybullet_zmq_wrapper_parallel(self._loop_rate)
         else:
             self._start_pybullet_zmq_wrapper_sequential(self._loop_rate)
+
+    @staticmethod
+    def print_warn(msg):
+        print("\033[33m" + msg + "\033[0m")
+
+    @staticmethod
+    def print_err(msg):
+        print("\033[31m" + msg + "\033[0m")
 
 
 if __name__ == "__main__":
