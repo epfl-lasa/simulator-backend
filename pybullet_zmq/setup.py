@@ -11,10 +11,11 @@ setuptools.setup(
     description="This package implements a ZMQ interface for the PyBullet simulation",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    # url="https://github.com/pypa/sampleproject",
+    url="https://github.com/epfl-lasa/simulator-backend/tree/develop/pybullet_zmq",
     packages=setuptools.find_packages(),
     install_requires=[
         "pybullet_simulation",
+        "network_interfaces==0.1.0",
         "pyyaml",
         "zmq",
     ],

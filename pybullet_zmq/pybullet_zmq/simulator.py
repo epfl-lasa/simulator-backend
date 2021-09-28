@@ -101,7 +101,7 @@ class PyBulletZmqWrapper:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Start PyBullet simulation with ZMQ interface.")
-    parser.add_argument("-c", "--config_file", type=str, default="franka_config.yaml",
+    parser.add_argument("-c", "--config-file", type=str, default="franka_config.yaml",
                         help="Configuration file for the simulation (default: franka_config.yaml)")
     args = parser.parse_args()
 

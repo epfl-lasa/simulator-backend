@@ -42,14 +42,15 @@ aica-docker server aica-technology/zmq-simulator -p 7770 -u ros2
 
 ## Running instructions
 
-Once inside the container, start the simulation with
+Once inside the container, start the simulation from anywhere with
 
 ```console
-python3 pybullet_zmq/simulator.py
+zmq-simulator [-c|--config-file path/to/config_file.yaml]
 ```
 
 The simulation can be configured by setting the values in [franka_config.yaml](pybullet_zmq/config/franka_config.yaml)
-to the desired ones.
+to the desired ones. Alternatively, the desired configuration file can be specified with the `--config-file` argument
+(relative and absolute paths allowed), as shown above.
 
 ### Pycharm setup for integrated Python development
 
