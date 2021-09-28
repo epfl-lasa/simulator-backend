@@ -13,12 +13,17 @@ class PyBulletZmqWrapper:
     """ZMQ wrapper class for pybullet simulator"""
 
     def __init__(self, config_file="franka_config.yaml"):
+        if not os.path.isfile(config_file):
+            script_dir = os.path.dirname(os.path.realpath(__file__))
+            config_file = os.path.join(script_dir, "config", config_file)
+        if not os.path.isfile(config_file):
+            raise ValueError("Configuration file not found!")
+
         self._pb = importlib.import_module("pybullet")
         self._zmq_context = zmq.Context(1)
         self._simulation = Simulation()
 
-        script_dir = os.path.dirname(os.path.realpath(__file__))
-        with open(os.path.join(script_dir, "config", config_file), "r") as stream:
+        with open(config_file, "r") as stream:
             robot_config = yaml.safe_load(stream)
         self._loop_rate = robot_config["loop_rate"]
 
@@ -26,8 +31,8 @@ class PyBulletZmqWrapper:
         self._robots = {}
         self._plugins = []
         for robot_name in robot_names:
-            urdf_path = os.path.join(script_dir, "robot_descriptions", robot_config["robots"][robot_name]["urdf_path"])
-            robot = Robot(sim_uid=self._simulation.uid, name=robot_name, urdf_path=urdf_path,
+            robot = Robot(sim_uid=self._simulation.uid, name=robot_name,
+                          urdf_path=robot_config["robots"][robot_name]["urdf_path"],
                           fixed_base=robot_config["robots"][robot_name]["fixed_base"],
                           use_inertia_from_file=robot_config["robots"][robot_name]["use_inertia_from_file"])
             self._robots[robot_name] = robot

@@ -2,13 +2,13 @@ loop_rate: 500.0
 
 robots:
   panda:
-    urdf_path: franka_panda_description/urdf/panda_arm.urdf
+    urdf_path: /home/ros2/robot_descriptions/franka_panda_description/urdf/panda_arm.urdf
     fixed_base: True
     use_inertia_from_file: True
     plugins:
-      - module: plugins.robot_state_publisher
+      - module: pybullet_zmq.plugins.robot_state_publisher
         class: RobotStatePublisher
         URI: "0.0.0.0:1601"
-      - module: plugins.control
+      - module: pybullet_zmq.plugins.control
         class: Control
         URI: "0.0.0.0:1602"
