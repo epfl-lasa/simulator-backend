@@ -1,3 +1,4 @@
+import argparse
 import importlib
 import os
 import time
@@ -13,12 +14,17 @@ class PyBulletZmqWrapper:
     """ZMQ wrapper class for pybullet simulator"""
 
     def __init__(self, config_file="franka_config.yaml"):
+        if not os.path.isfile(config_file):
+            script_dir = os.path.dirname(os.path.realpath(__file__))
+            config_file = os.path.join(script_dir, "config", config_file)
+        if not os.path.isfile(config_file):
+            raise ValueError("Configuration file not found!")
+
         self._pb = importlib.import_module("pybullet")
         self._zmq_context = zmq.Context(1)
-        self._simulation = Simulation()
+        self._simulation = Simulation(log_info=print, log_warn=self.print_warn, log_err=self.print_err)
 
-        script_dir = os.path.dirname(os.path.realpath(__file__))
-        with open(os.path.join(script_dir, "config", config_file), "r") as stream:
+        with open(config_file, "r") as stream:
             robot_config = yaml.safe_load(stream)
         self._loop_rate = robot_config["loop_rate"]
 
@@ -26,10 +32,11 @@ class PyBulletZmqWrapper:
         self._robots = {}
         self._plugins = []
         for robot_name in robot_names:
-            urdf_path = os.path.join(script_dir, "robot_descriptions", robot_config["robots"][robot_name]["urdf_path"])
-            robot = Robot(sim_uid=self._simulation.uid, name=robot_name, urdf_path=urdf_path,
+            robot = Robot(sim_uid=self._simulation.uid, name=robot_name,
+                          urdf_path=robot_config["robots"][robot_name]["urdf_path"],
                           fixed_base=robot_config["robots"][robot_name]["fixed_base"],
-                          use_inertia_from_file=robot_config["robots"][robot_name]["use_inertia_from_file"])
+                          use_inertia_from_file=robot_config["robots"][robot_name]["use_inertia_from_file"],
+                          log_info=print, log_warn=self.print_warn, log_err=self.print_err)
             self._robots[robot_name] = robot
 
             # import plugins dynamically
@@ -71,7 +78,8 @@ class PyBulletZmqWrapper:
         Execute plugins in parallel, however watch their execution time and warn if exceeds the deadline (loop rate)
         """
         exec_manager_obj = FuncExecManager(self._plugins, lambda: not self._simulation.is_alive(),
-                                           self._simulation.step, self._simulation.is_paused, log_debug=lambda x: None)
+                                           self._simulation.step, self._simulation.is_paused, log_info=print,
+                                           log_warn=self.print_warn, log_debug=lambda x: None)
         print("[PyBulletZmqWrapper::start_pybullet_zmq_wrapper_parallel] Starting parallel execution of plugins.")
         # start parallel execution of all "execute" class methods in a synchronous way
         exec_manager_obj.start_synchronous_execution(loop_rate=loop_rate)
@@ -82,11 +90,20 @@ class PyBulletZmqWrapper:
         else:
             self._start_pybullet_zmq_wrapper_sequential(self._loop_rate)
 
+    @staticmethod
+    def print_warn(msg):
+        print("\033[33m" + msg + "\033[0m")
 
-def main():
-    wrapper = PyBulletZmqWrapper()
-    wrapper.start_pybullet_zmq_wrapper()
+    @staticmethod
+    def print_err(msg):
+        print("\033[31m" + msg + "\033[0m")
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Start PyBullet simulation with ZMQ interface.")
+    parser.add_argument("-c", "--config-file", type=str, default="franka_config.yaml",
+                        help="Configuration file for the simulation (default: franka_config.yaml)")
+    args = parser.parse_args()
+
+    wrapper = PyBulletZmqWrapper(args.config_file)
+    wrapper.start_pybullet_zmq_wrapper()
