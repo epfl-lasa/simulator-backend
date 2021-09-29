@@ -1,10 +1,9 @@
-import os
 import time
 
 import zmq
+from network_interfaces.zmq import network
 from pybullet_simulation import Robot
 from pybullet_simulation import Simulation
-from pybullet_simulation import network
 
 
 def main():
@@ -15,11 +14,9 @@ def main():
 
     desired_frequency = 500.0
 
-    simulation = Simulation(gui=True)
+    simulation = Simulation(gui=False)
 
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    robot = Robot(simulation.uid, "panda",
-                  os.path.join(script_dir, "robot_descriptions/franka_panda_description/urdf/panda_arm.urdf"))
+    robot = Robot(simulation.uid, "panda", "/home/ros2/robot_descriptions/franka_panda_description/urdf/panda_arm.urdf")
 
     start = time.time()
     k = 0
@@ -32,11 +29,10 @@ def main():
         state = network.StateMessage(ee_state, joint_state)
         network.send_state(state, state_publisher)
 
-        command = network.poll_command(command_subscriber)
+        command = network.receive_command(command_subscriber)
         if command:
             print("received command")
-            # print(command.control_type)
-            print(command.joint_state)
+            print(command)
 
         elapsed = time.time() - now
         sleep_time = (1. / desired_frequency) - elapsed
