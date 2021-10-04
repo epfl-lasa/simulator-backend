@@ -1,12 +1,8 @@
-"""
-Position, velocity and effort control for all joints on the robot
-"""
 import rospy
 from std_msgs.msg import Float64MultiArray
 
 
 class PosVelEffControl:
-    """Helper class to receive position, velocity or effort control commands"""
 
     def __init__(self, controller_type, namespace):
         """
@@ -38,15 +34,15 @@ class Control:
     def __init__(self, pybullet, robot, **kwargs):
         self._pb = pybullet
         self._robot = robot
-        self._position_joint_commands = [0] * len(self._robot.joint_indices)
-        self._velocity_joint_commands = [0] * len(self._robot.joint_indices)
-        self._effort_joint_commands = [0] * len(self._robot.joint_indices)
+        self._position_joint_commands = [0] * self._robot.nb_joints
+        self._velocity_joint_commands = [0] * self._robot.nb_joints
+        self._effort_joint_commands = [0] * self._robot.nb_joints
 
         # the max force to apply to the joint, used in velocity control
         if "max_effort" in kwargs.keys():
-            self._force_commands = [kwargs["max_torque"]] * len(self._robot.joint_indices)
+            self._force_commands = [kwargs["max_torque"]] * self._robot.nb_joints
         else:
-            self._force_commands = [100] * len(self._robot.joint_indices)
+            self._force_commands = [100] * self._robot.nb_joints
 
         self._last_command_type = ""
 
@@ -56,14 +52,11 @@ class Control:
         self._tc_subscriber = PosVelEffControl("effort", self._robot.namespace)
 
     def execute(self):
-        """
-        Execute the plugin. This function is called from main update loop.
-        """
         control_params = {"bodyUniqueId": self._robot.id, "jointIndices": self._robot.joint_indices}
         if self._last_command_type == "effort" and not self._tc_subscriber.get_is_data_available():
             self._last_command_type = ""
             control_params["controlMode"] = self._pb.VELOCITY_CONTROL
-            control_params["targetVelocities"] = [0] * len(self._robot.joint_indices)
+            control_params["targetVelocities"] = [0] * self._robot.nb_joints
             control_params["forces"] = self._force_commands
         if self._pc_subscriber.get_is_data_available():
             self._last_command_type = "position"
@@ -80,7 +73,7 @@ class Control:
                 self._last_command_type = "effort"
                 self._pb.setJointMotorControlArray(self._robot.id, self._robot.joint_indices,
                                                    self._pb.VELOCITY_CONTROL,
-                                                   forces=[0] * len(self._robot.joint_indices))
+                                                   forces=[0] * self._robot.nb_joints)
             control_params["controlMode"] = self._pb.TORQUE_CONTROL
             control_params["forces"] = self._robot.compensate_gravity(self._tc_subscriber.get_last_cmd())
 

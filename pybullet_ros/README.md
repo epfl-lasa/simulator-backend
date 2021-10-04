@@ -1,4 +1,4 @@
-# PyBullet ROS2
+# PyBullet ROS
 
 ## Usage instructions
 
