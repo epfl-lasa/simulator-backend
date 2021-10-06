@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="config_file" default="$(find pybullet_ros)/config/rbcairos_config.yaml"/>
+    <!--    <arg name="environment" default="environment"/> &lt;!&ndash; name of python file without the .py inside plugins folder &ndash;&gt;-->
+    <arg name="pybullet_gui" default="True"/>
+    <arg name="gui_options" default=""/>
+    <arg name="rviz_bringup" default="True"/>
+    <arg name="rviz_config" default="$(find pybullet_ros)/rviz/rbcairos.rviz"/>
+    <arg name="start_paused" default="False"/>
+    <arg name="parallel_plugin_execution" default="True"/>
+    <!--    <arg name="use_deformable_world" default="False"/> &lt;!&ndash; enable/disable soft body simulation &ndash;&gt;-->
+
+    <group ns="rbcairos">
+        <arg name="urdf_path" default="$(find rbkairos_description)/robots/rbkairos_base.urdf.xacro"/>
+        <param name="urdf_path" value="$(arg urdf_path)"/>
+        <param name="fixed_base" value="False"/>
+        <param name="use_inertia_from_file" value="True"/>
+        <param name="robot_description" command="$(find xacro)/xacro $(arg urdf_path) prefix:='' ros_planar_move_plugin:=false"/>
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen"/>
+    </group>
+
+    <!-- pybullet ros wrapper -->
+    <include file="$(find pybullet_ros)/launch/pybullet_ros.launch">
+        <arg name="config_file" value="$(arg config_file)"/>
+        <!--        <arg name="environment" value="$(arg environment)"/>-->
+        <arg name="pybullet_gui" value="$(arg pybullet_gui)"/>
+        <arg name="gui_options" value="$(arg gui_options)"/>
+        <arg name="rviz_bringup" value="$(arg rviz_bringup)"/>
+        <arg name="rviz_config" value="$(arg rviz_config)"/>
+        <arg name="start_paused" value="$(arg start_paused)"/>
+        <arg name="parallel_plugin_execution" value="$(arg parallel_plugin_execution)"/>
+        <!--        <arg name="use_deformable_world" value="$(arg use_deformable_world)"/>-->
+    </include>
+
+</launch>

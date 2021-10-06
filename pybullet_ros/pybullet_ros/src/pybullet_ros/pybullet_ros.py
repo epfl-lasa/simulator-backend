@@ -75,7 +75,7 @@ class PyBulletRosWrapper(object):
         """
         Execute plugins in parallel, however watch their execution time and warn if exceeds the deadline (loop rate)
         """
-        exec_manager_obj = FuncExecManager(self._plugins, lambda x: not rospy.is_shutdown(), self._simulation.step,
+        exec_manager_obj = FuncExecManager(self._plugins, rospy.is_shutdown, self._simulation.step,
                                            self._simulation.is_paused, log_info=rospy.loginfo,
                                            log_warn=rospy.logwarn, log_debug=rospy.logdebug)
         # start parallel execution of all "execute" class methods in a synchronous way

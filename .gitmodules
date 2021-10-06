@@ -4,3 +4,6 @@
 [submodule "network-interfaces"]
 	path = network-interfaces
 	url = git@github.com:aica-technology/network-interfaces.git
+[submodule "rbkairos_common"]
+	path = rbkairos_common
+	url = git@github.com:liuyangdh/rbkairos_common.git
