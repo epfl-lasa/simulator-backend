@@ -167,7 +167,7 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
       Name: RobotModel
-      Robot Description: /rbcairos/robot_description
+      Robot Description: /rbkairos/robot_description
       TF Prefix: ""
       Update Interval: 0
       Value: true

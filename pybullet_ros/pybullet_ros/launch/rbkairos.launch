@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <launch>
 
-    <arg name="config_file" default="$(find pybullet_ros)/config/rbcairos_config.yaml"/>
+    <arg name="config_file" default="$(find pybullet_ros)/config/rbkairos_config.yaml"/>
     <!--    <arg name="environment" default="environment"/> &lt;!&ndash; name of python file without the .py inside plugins folder &ndash;&gt;-->
     <arg name="pybullet_gui" default="True"/>
     <arg name="gui_options" default=""/>
     <arg name="rviz_bringup" default="True"/>
-    <arg name="rviz_config" default="$(find pybullet_ros)/rviz/rbcairos.rviz"/>
+    <arg name="rviz_config" default="$(find pybullet_ros)/rviz/rbkairos.rviz"/>
     <arg name="start_paused" default="False"/>
     <arg name="parallel_plugin_execution" default="True"/>
     <!--    <arg name="use_deformable_world" default="False"/> &lt;!&ndash; enable/disable soft body simulation &ndash;&gt;-->
 
-    <group ns="rbcairos">
+    <group ns="rbkairos">
         <arg name="urdf_path" default="$(find rbkairos_description)/robots/rbkairos_base.urdf.xacro"/>
         <param name="urdf_path" value="$(arg urdf_path)"/>
         <param name="fixed_base" value="False"/>

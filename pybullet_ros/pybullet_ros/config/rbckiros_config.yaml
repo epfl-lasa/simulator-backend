@@ -3,7 +3,7 @@ gravity: -9.81 # earth gravity in m/s^2
 #max_torque: 100.0 # the maximal torque to apply to the robot joints in velocity mode
 
 robots:
-  rbcairos:
+  rbkairos:
     - module: pybullet_ros.plugins.base_control
       class: BaseControl
     - module: pybullet_ros.plugins.joint_state_publisher

@@ -8,7 +8,7 @@ class BaseControl:
         self._robot = robot
 
         self._cmd = Twist()
-        self._subscriber = rospy.Subscriber(self._robot.namespace + "cmd_vel", Twist, self._base_control_cb,
+        self._subscriber = rospy.Subscriber(self._robot.namespace + "base/cmd_vel", Twist, self._base_control_cb,
                                             queue_size=1)
 
     def _base_control_cb(self, msg):
