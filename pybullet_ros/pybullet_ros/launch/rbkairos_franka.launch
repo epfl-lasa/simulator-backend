@@ -23,6 +23,15 @@
         <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen"/>
     </group>
 
+    <group ns="table1">
+        <arg name="urdf_path" default="$(find rbkairos_description)/robots/table.urdf.xacro"/>
+        <param name="urdf_path" value="$(arg urdf_path)"/>
+        <param name="fixed_base" value="True"/>
+        <param name="use_inertia_from_file" value="True"/>
+        <param name="robot_description" command="$(find xacro)/xacro $(arg urdf_path) connected_to:=odom xyz:='3 0 0'"/>
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen"/>
+    </group>
+
     <!-- pybullet ros wrapper -->
     <include file="$(find pybullet_ros)/launch/pybullet_ros.launch">
         <arg name="config_file" value="$(arg config_file)"/>

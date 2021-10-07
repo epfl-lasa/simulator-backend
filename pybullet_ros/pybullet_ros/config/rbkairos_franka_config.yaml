@@ -14,3 +14,6 @@ robots:
     - module: pybullet_ros.plugins.odometry
       class: Odom
       frame_name: robotbase_footprint
+  table1:
+    - module: pybullet_ros.plugins.template
+      class: TemplatePluginClass
