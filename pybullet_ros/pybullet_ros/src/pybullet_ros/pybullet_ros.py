@@ -25,7 +25,8 @@ class PyBulletRosWrapper(object):
         #     # set gravity and ground plane
         #     self._environment.load_environment()
         self._pb.setGravity(0, 0, rospy.get_param("~gravity", -9.81))
-        self._pb.loadURDF('plane.urdf')
+        ground = self._pb.loadURDF('plane.urdf')
+        self._pb.changeDynamics(ground, -1, restitution=0.9)
 
         robot_names = rospy.get_param("~robots", None)
         self._robots = {}

@@ -1,5 +1,6 @@
 import rospy
 from std_msgs.msg import Float64MultiArray
+from std_srvs.srv import Trigger, TriggerResponse
 
 
 class PosVelEffControl:
@@ -52,37 +53,49 @@ class ArmControl:
             self._force_commands = [100] * len(self._joint_indices)
 
         self._last_command_type = ""
+        self._lock = False
 
         # setup subscribers
         self._pc_subscriber = PosVelEffControl("position", self._robot.namespace)
         self._vc_subscriber = PosVelEffControl("velocity", self._robot.namespace)
         self._tc_subscriber = PosVelEffControl("effort", self._robot.namespace)
 
-    def execute(self):
-        control_params = {"bodyUniqueId": self._robot.id, "jointIndices": self._joint_indices}
-        if self._last_command_type == "effort" and not self._tc_subscriber.get_is_data_available():
-            self._last_command_type = ""
-            control_params["controlMode"] = self._pb.VELOCITY_CONTROL
-            control_params["targetVelocities"] = [0] * len(self._joint_indices)
-            control_params["forces"] = self._force_commands
-        if self._pc_subscriber.get_is_data_available():
-            self._last_command_type = "position"
-            control_params["controlMode"] = self._pb.POSITION_CONTROL
-            control_params["targetPositions"] = self._pc_subscriber.get_last_cmd()
-            control_params["forces"] = self._force_commands
-        if self._vc_subscriber.get_is_data_available():
-            self._last_command_type = "velocity"
-            control_params["controlMode"] = self._pb.VELOCITY_CONTROL
-            control_params["targetVelocities"] = self._vc_subscriber.get_last_cmd()
-            control_params["forces"] = self._force_commands
-        if self._tc_subscriber.get_is_data_available():
-            if self._last_command_type != "effort":
-                self._last_command_type = "effort"
-                self._pb.setJointMotorControlArray(self._robot.id, self._robot.joint_indices,
-                                                   self._pb.VELOCITY_CONTROL,
-                                                   forces=[0] * len(self._joint_indices))
-            control_params["controlMode"] = self._pb.TORQUE_CONTROL
-            control_params["forces"] = self._robot.compensate_gravity(self._tc_subscriber.get_last_cmd())
+        self.lock_service = rospy.Service("/arm/lock_joints", Trigger, self._lock_joints)
 
-        if "controlMode" in control_params.keys():
-            self._pb.setJointMotorControlArray(**control_params)
+    def _lock_joints(self, request):
+        self._lock_state = [self._pb.getJointState(self._robot.id, joint)[0] for joint in self._joint_indices]
+        self._lock = True
+        return TriggerResponse(success=True, message="Locking joints")
+
+    def execute(self):
+        if self._lock:
+            for i, joint in enumerate(self._joint_indices):
+                self._pb.resetJointState(self._robot.id, joint, self._lock_state[i], 0)
+        else:
+            control_params = {"bodyUniqueId": self._robot.id, "jointIndices": self._joint_indices}
+            if self._last_command_type == "effort" and not self._tc_subscriber.get_is_data_available():
+                self._last_command_type = ""
+                control_params["controlMode"] = self._pb.VELOCITY_CONTROL
+                control_params["targetVelocities"] = [0] * len(self._joint_indices)
+                control_params["forces"] = self._force_commands
+            if self._pc_subscriber.get_is_data_available():
+                self._last_command_type = "position"
+                control_params["controlMode"] = self._pb.POSITION_CONTROL
+                control_params["targetPositions"] = self._pc_subscriber.get_last_cmd()
+                control_params["forces"] = self._force_commands
+            if self._vc_subscriber.get_is_data_available():
+                self._last_command_type = "velocity"
+                control_params["controlMode"] = self._pb.VELOCITY_CONTROL
+                control_params["targetVelocities"] = self._vc_subscriber.get_last_cmd()
+                control_params["forces"] = self._force_commands
+            if self._tc_subscriber.get_is_data_available():
+                if self._last_command_type != "effort":
+                    self._last_command_type = "effort"
+                    self._pb.setJointMotorControlArray(self._robot.id, self._robot.joint_indices,
+                                                       self._pb.VELOCITY_CONTROL,
+                                                       forces=[0] * len(self._joint_indices))
+                control_params["controlMode"] = self._pb.TORQUE_CONTROL
+                control_params["forces"] = self._robot.compensate_gravity(self._tc_subscriber.get_last_cmd())
+
+            if "controlMode" in control_params.keys():
+                self._pb.setJointMotorControlArray(**control_params)

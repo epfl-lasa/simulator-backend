@@ -17,3 +17,14 @@ robots:
   table1:
     - module: pybullet_ros.plugins.template
       class: TemplatePluginClass
+  table2:
+    - module: pybullet_ros.plugins.template
+      class: TemplatePluginClass
+  box:
+    - module: pybullet_ros.plugins.template
+      class: TemplatePluginClass
+  ball:
+    - module: pybullet_ros.plugins.tf_publisher
+      class: TFPublisher
+    - module: pybullet_ros.plugins.ball
+      class: Ball
