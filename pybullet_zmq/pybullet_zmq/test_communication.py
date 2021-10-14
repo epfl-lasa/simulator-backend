@@ -9,7 +9,7 @@ from pybullet_simulation import Simulation
 def main():
     context = zmq.Context(1)
     subscriber_address = "0.0.0.0:1602"
-    publisher_address = "*:1601"
+    publisher_address = "0.0.0.0:1601"
     command_subscriber, state_publisher = network.configure_sockets(context, subscriber_address, publisher_address)
 
     desired_frequency = 500.0

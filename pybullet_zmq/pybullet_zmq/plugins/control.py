@@ -3,7 +3,21 @@ from network_interfaces.zmq import network
 
 
 class Control:
+    """
+    Control the robot in position, velocity, and torque mode.
+    """
+
     def __init__(self, zmq_context, pybullet, robot, **kwargs):
+        """
+        Constructor of the Control plugin.
+
+        :param zmq_context: ZMQ context to create publisher
+        :param pybullet: Imported pybullet library
+        :param robot: Robot object
+        :type zmq_context: zmq.Context
+        :type pybullet: types.ModuleType
+        :type robot: pybullet_simulation.Robot
+        """
         self._pb = pybullet
         self._robot = robot
         self._subscriber = network.configure_subscriber(zmq_context, str(kwargs["URI"]), False)
@@ -13,6 +27,9 @@ class Control:
         self._force_commands = [100] * self._robot.nb_joints
 
     def execute(self):
+        """
+        Execution function of the plugin.
+        """
         control_params = {"bodyUniqueId": self._robot.id, "jointIndices": self._robot.joint_indices}
         command = network.receive_command(self._subscriber)
         if command:
