@@ -7,7 +7,7 @@ PyBullet Simulator with a ZMQ communication interface.
 First, make sure to clone [aica-technology/docker-images](https://github.com/aica-technology/docker-images) and install
 the scripts before you start, as the instructions below rely on those scripts.
 
-Second, build the image with `bash build.sh`.
+Second, build the image with `bash build-server.sh`.
 
 Finally, you have two options to run the container, either as a [runtime container](#run-container-in-interactive-mode)
 or as an [SSH server](#ssh-server-for-remote-development) for remote development.
@@ -37,7 +37,7 @@ docker cp aica-technology-zmq-simulator-runtime:/home/<user>/path/within/contain
 To start up an SSH server in the background for remote development, run
 
 ```console
-aica-docker server aica-technology/zmq-simulator -p 7770 -u ros2
+bash build-server.sh -s
 ```
 
 ## Running instructions
