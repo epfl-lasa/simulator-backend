@@ -14,11 +14,18 @@ class PyBulletZmqWrapper:
     """ZMQ wrapper class for pybullet simulator"""
 
     def __init__(self, config_file="franka_config.yaml"):
+        """
+        Constructor of the PyBulletZmqWrapper class.
+
+        :param config_file: Relative or absolute path to the configuration file
+        :type config_file: str
+        """
+        assert isinstance(config_file, str), "[PyBulletZmqWrapper::init] Argument 'config_file' has an incorrect type."
         if not os.path.isfile(config_file):
             script_dir = os.path.dirname(os.path.realpath(__file__))
             config_file = os.path.join(script_dir, "config", config_file)
         if not os.path.isfile(config_file):
-            raise ValueError("Configuration file not found!")
+            raise ValueError("[PyBulletZmqWrapper::init] Configuration file not found!")
 
         self._pb = importlib.import_module("pybullet")
         self._zmq_context = zmq.Context(1)
@@ -26,6 +33,7 @@ class PyBulletZmqWrapper:
 
         with open(config_file, "r") as stream:
             robot_config = yaml.safe_load(stream)
+        self._parallel_plugin_execution = robot_config["parallel_plugin_execution"]
         self._loop_rate = robot_config["loop_rate"]
 
         robot_names = robot_config["robots"].keys()
@@ -58,7 +66,7 @@ class PyBulletZmqWrapper:
 
     def _start_pybullet_zmq_wrapper_sequential(self, loop_rate):
         """
-        This function is deprecated, we recommend the use of parallel plugin execution
+        This function is deprecated, the use of parallel plugin execution is recommended.
         """
         print("[PyBulletZmqWrapper::start_pybullet_zmq_wrapper_sequential] Starting sequential execution of plugins.")
         while self._simulation.is_alive():
@@ -75,7 +83,10 @@ class PyBulletZmqWrapper:
 
     def _start_pybullet_zmq_wrapper_parallel(self, loop_rate):
         """
-        Execute plugins in parallel, however watch their execution time and warn if exceeds the deadline (loop rate)
+        Execute plugins in parallel, however watch their execution time and warn if they exceed the loop rate.
+
+        :param loop_rate: Loop rate of parallel execution
+        :type loop_rate: float
         """
         exec_manager_obj = FuncExecManager(self._plugins, lambda: not self._simulation.is_alive(),
                                            self._simulation.step, self._simulation.is_paused, log_info=print,
@@ -84,18 +95,33 @@ class PyBulletZmqWrapper:
         # start parallel execution of all "execute" class methods in a synchronous way
         exec_manager_obj.start_synchronous_execution(loop_rate=loop_rate)
 
-    def start_pybullet_zmq_wrapper(self, parallel_execution=True):
-        if parallel_execution:
+    def start_pybullet_zmq_wrapper(self):
+        """
+        Start execution of plugins.
+        """
+        if self._parallel_plugin_execution:
             self._start_pybullet_zmq_wrapper_parallel(self._loop_rate)
         else:
             self._start_pybullet_zmq_wrapper_sequential(self._loop_rate)
 
     @staticmethod
     def print_warn(msg):
+        """
+        Print message in yellow.
+
+        :param msg: Message to print
+        :type msg: str
+        """
         print("\033[33m" + msg + "\033[0m")
 
     @staticmethod
     def print_err(msg):
+        """
+        Print message in red.
+
+        :param msg: Message to print
+        :type msg: str
+        """
         print("\033[31m" + msg + "\033[0m")
 
 

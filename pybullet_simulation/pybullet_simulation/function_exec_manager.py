@@ -80,7 +80,7 @@ class FuncExecManager:
             end_time = time.time()
             self._log_warn(
                 f"[FuncExecManager::time_control] {class_name}: Missed loop rate, took "
-                f"{str(round(end_time - start_time - (1.0 / self._loop_rate), 2))} sec longer than expected")
+                f"{str(round(end_time - start_time - (1.0 / self._loop_rate), 3))} sec longer than expected")
             self._late_functions.append(obj)
 
     def _loop_thread(self):
@@ -120,7 +120,7 @@ class FuncExecManager:
                         self._late_threads[-1].start()
                     self._late_functions = []
                 # sleep to reduce computational load
-                time.sleep(0.001)
+                time.sleep(0.0001)
                 while self._pause_execution():
                     time.sleep(0.1)
             self._exec_after_each_loop()

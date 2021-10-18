@@ -11,12 +11,14 @@ class Robot(RobotDescription):
     This is a collection of methods that gather 'real-time' information about the robot state and apply joint commands
     to the robot. In other words, those are the methods called (at each time step) in the simulation loop.
     Available methods (for usage, see documentation at function definition):
+        - set_torque_control
         - get_joint_state
         - get_link_state
         - get_ee_link_state
         - get_base_state
         - get_jacobian
         - get_inertia
+        - set_applied_motor_torques
         - compensate_gravity
     """
 
@@ -52,9 +54,32 @@ class Robot(RobotDescription):
         self._sim_uid = sim_uid
         super().__init__(self._sim_uid, name, urdf_path, fixed_base, use_inertia_from_file)
 
+        self._torque_controlled = False
+        self._applied_motor_torques = [0] * self.nb_joints
+
         self._log_info = log_info
         self._log_warn = log_warn
         self._log_err = log_err
+
+    def set_torque_control(self, enable):
+        """
+        Set torque control of the robot to true or false.
+
+        :param enable: Flag to set if robot is in torque control
+        :type enable: bool
+        """
+        assert isinstance(enable, bool), "[Robot::set_torque_control] Argument 'enable' has an incorrect type."
+        self._torque_controlled = enable
+
+    @property
+    def is_torque_controlled(self):
+        """
+        Check if robot is currently in torque control mode.
+
+        :return: Boolean if robot is in torque control
+        :rtype: bool
+        """
+        return self._torque_controlled
 
     def get_joint_state(self):
         """
@@ -67,12 +92,14 @@ class Robot(RobotDescription):
         joint_velocities = []
         joint_efforts = []
 
-        for idx in self.joint_indices:
-            joint_state = pb.getJointState(
-                self._id, idx, physicsClientId=self._sim_uid)
+        for j, idx in enumerate(self.joint_indices):
+            joint_state = pb.getJointState(self._id, idx, physicsClientId=self._sim_uid)
             joint_positions.append(joint_state[0])
             joint_velocities.append(joint_state[1])
-            joint_efforts.append(joint_state[3])
+            if self._torque_controlled:
+                joint_efforts.append(self._applied_motor_torques[j])
+            else:
+                joint_efforts.append(joint_state[3])
         state = JointState(self.name, self.joint_names)
         state.set_positions(joint_positions)
         state.set_velocities(joint_velocities)
@@ -170,17 +197,32 @@ class Robot(RobotDescription):
         else:
             return np.array(pb.calculateMassMatrix(self._id, joint_positions.tolist()))
 
-    def compensate_gravity(self, raw_command):
+    def set_applied_motor_torques(self, applied_motor_torques):
+        """
+        Set the applied joint motor torques manually in torque control.
+
+        :param applied_motor_torques: The applied joint motor torques
+        :type applied_motor_torques: list of float
+        """
+        if len(applied_motor_torques) is not self.nb_joints:
+            self._log_warn("[Robot::set_applied_motor_torques] Invalid number of elements in your input.")
+            return
+        self._applied_motor_torques = applied_motor_torques
+
+    def compensate_gravity(self, feed_forward):
         """
         Compensate gravity for a given effort command.
 
-        :param raw_command: Raw effort command
-        :type raw_command: list of float
+        :param feed_forward: Feed forward effort command
+        :type feed_forward: list of float
         :return: Gravity compensated command
         :rtype: list of float
         """
+        if len(feed_forward) is not self.nb_joints:
+            self._log_warn("[Robot::compensate_gravity] Invalid number of elements in your input.")
+            return False
         joint_state = self.get_joint_state()
         gravity_compensation = pb.calculateInverseDynamics(self._id, joint_state.get_positions().tolist(),
                                                            joint_state.get_velocities().tolist(),
                                                            [0] * len(self.joint_indices), self._sim_uid)
-        return [a + b for a, b in zip(raw_command, gravity_compensation)]
+        return [a + b for a, b in zip(feed_forward, gravity_compensation)]
