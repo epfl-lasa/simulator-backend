@@ -102,7 +102,7 @@ class Control:
 
         if self._robot.is_torque_controlled:
             self._control_params["controlMode"] = self._pb.TORQUE_CONTROL
-            torques = self._robot.compensate_gravity(self._last_torque_command)
+            torques = self._robot.compensate_gravity(feed_forward=self._last_torque_command)
             self._control_params["forces"] = torques
             self._robot.set_applied_motor_torques(torques)
 

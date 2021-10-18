@@ -10,7 +10,7 @@ scripts before you start, as the instructions below rely on those scripts.
 To build the image,
 
 ```bash
-bash build.sh
+bash build-server.sh
 ```
 
 ### Run image interactively
