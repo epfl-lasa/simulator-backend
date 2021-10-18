@@ -55,7 +55,8 @@ class Control:
                 self._last_torque_command = command.joint_state.get_torques()
             else:
                 self._robot.set_torque_control(False)
-                self._control_params.pop("controlMode")
+                if "controlMode" in self._control_params.keys():
+                    self._control_params.pop("controlMode")
 
         if self._robot.is_torque_controlled:
             self._control_params["controlMode"] = self._pb.TORQUE_CONTROL
