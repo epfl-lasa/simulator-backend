@@ -209,17 +209,20 @@ class Robot(RobotDescription):
             return
         self._applied_motor_torques = applied_motor_torques
 
-    def compensate_gravity(self, raw_command):
+    def compensate_gravity(self, feed_forward):
         """
         Compensate gravity for a given effort command.
 
-        :param raw_command: Raw effort command
-        :type raw_command: list of float
+        :param feed_forward: Feed forward effort command
+        :type feed_forward: list of float
         :return: Gravity compensated command
         :rtype: list of float
         """
+        if len(feed_forward) is not self.nb_joints:
+            self._log_warn("[Robot::compensate_gravity] Invalid number of elements in your input.")
+            return False
         joint_state = self.get_joint_state()
         gravity_compensation = pb.calculateInverseDynamics(self._id, joint_state.get_positions().tolist(),
                                                            joint_state.get_velocities().tolist(),
                                                            [0] * len(self.joint_indices), self._sim_uid)
-        return [a + b for a, b in zip(raw_command, gravity_compensation)]
+        return [a + b for a, b in zip(feed_forward, gravity_compensation)]
