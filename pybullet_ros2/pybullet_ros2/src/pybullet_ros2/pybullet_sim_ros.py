@@ -1,8 +1,8 @@
 import os
 
 import rclpy
-from std_srvs.srv import Trigger
 from pybullet_simulation import Simulation
+from std_srvs.srv import Trigger
 
 
 class PyBulletSimROS(Simulation):
@@ -36,6 +36,10 @@ class PyBulletSimROS(Simulation):
                                   self.pause_simulation)
         self.node_.create_service(Trigger, os.path.join(self.node_.get_name(), "unpause_simulation"),
                                   self.unpause_simulation)
+
+    def step_simulation(self):
+        if self.is_alive and not self._simulation_paused:
+            self.step()
 
     def reset_simulation(self, req, res):
         """

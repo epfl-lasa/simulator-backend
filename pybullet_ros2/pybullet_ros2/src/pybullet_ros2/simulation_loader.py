@@ -4,15 +4,25 @@ import os
 
 import launch_ros.actions
 import rclpy
-import rclpy.node
 import yaml
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription, LaunchService
 from launch.substitutions import Command
+from rclpy.node import Node
 
 
-class PreLoader(rclpy.node.Node):
+class SimulationLoader(Node):
+    """
+    Helper class to spin up all required nodes from the launch file and the simulation configuration.
+    """
+
     def __init__(self, node_name):
+        """
+        Constructor of the SimulationLoader class.
+
+        :param node_name: Name of the node
+        :type node_name: str
+        """
         super().__init__(node_name)
         self.declare_parameters(
             namespace="",
@@ -41,7 +51,7 @@ class PreLoader(rclpy.node.Node):
 
 def main():
     rclpy.init()
-    preloader = PreLoader("preloader")
+    preloader = SimulationLoader("sim_loader")
     yaml_content = preloader.robot_config
 
     nodes = []

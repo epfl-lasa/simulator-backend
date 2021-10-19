@@ -25,7 +25,7 @@ setup(
     package_dir={'': 'src'},
     tests_require=['pytest'],
     entry_points={
-        'console_scripts': ['preloader = pybullet_ros2.preloader:main',
+        'console_scripts': ['simulation_loader = pybullet_ros2.simulation_loader:main',
                             'pybullet_ros2 = pybullet_ros2.pybullet_ros2:main']
     }
 )

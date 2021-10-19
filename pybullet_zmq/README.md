@@ -40,6 +40,11 @@ To start up an SSH server in the background for remote development, run
 bash build-server.sh -s
 ```
 
+#### Pycharm setup for integrated Python development
+
+See [ros-pycharm-example](https://github.com/domire8/ros-pycharm-example) for help on configuring a Python interpreter
+with an SSH host.
+
 ## Running instructions
 
 Once inside the container, start the simulation from anywhere with
@@ -51,8 +56,3 @@ zmq-simulator [-c|--config-file path/to/config_file.yaml]
 The simulation can be configured by setting the values in [franka_config.yaml](pybullet_zmq/config/franka_config.yaml)
 to the desired ones. Alternatively, the desired configuration file can be specified with the `--config-file` argument
 (relative and absolute paths allowed), as shown above.
-
-### Pycharm setup for integrated Python development
-
-See [ros-pycharm-example](https://github.com/domire8/ros-pycharm-example) for help on configuring a Python interpreter
-with an SSH host.
