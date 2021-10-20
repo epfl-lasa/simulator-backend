@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- partial configuration params for pybullet_ros node, rest will be loaded from config_file -->
+    <arg name="config_file" default="$(find pybullet_ros)/config/franka_config.yaml"/>
+    <!--    <arg name="environment" default="environment"/>-->
+    <arg name="pybullet_gui" default="True"/>
+    <arg name="gui_options" default=""/>
+    <arg name="rviz_bringup" default="False"/>
+    <arg name="rviz_config" default="$(find pybullet_ros)/rviz/franka.rviz"/>
+    <arg name="start_paused" default="False"/>
+    <arg name="parallel_plugin_execution" default="False"/>
+    <!--    <arg name="use_deformable_world" default="False"/> &lt;!&ndash; enable/disable soft body simulation &ndash;&gt;-->
+
+    <!-- pybullet ros wrapper -->
+    <node pkg="pybullet_ros" type="pybullet_ros" name="pybullet_ros" output="screen" required="true">
+        <rosparam file="$(arg config_file)" command="load"/>
+        <!--        <param name="environment" value="$(arg environment)"/>-->
+        <param name="pybullet_gui" value="$(arg pybullet_gui)"/>
+        <param name="gui_options" value="$(arg gui_options)"/>
+        <param name="start_paused" value="$(arg start_paused)"/>
+        <param name="parallel_plugin_execution" value="$(arg parallel_plugin_execution)"/>
+        <!--        <param name="use_deformable_world" value="$(arg use_deformable_world)"/>-->
+    </node>
+
+    <group if="$(arg rviz_bringup)">
+        <node type="rviz" name="rviz" pkg="rviz" args="-d $(arg rviz_config)"/>
+    </group>
+
+</launch>
