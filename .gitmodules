@@ -1,6 +1,3 @@
 [submodule "robot_descriptions/franka_panda_description"]
 	path = robot_descriptions/franka_panda_description
 	url = git@github.com:aica-technology/franka_panda_description.git
-[submodule "network-interfaces"]
-	path = network-interfaces
-	url = git@github.com:aica-technology/network-interfaces.git
