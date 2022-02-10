@@ -15,9 +15,8 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         "pybullet_simulation",
-        "network_interfaces==0.1.0",
+        "network_interfaces>=0.1.0",
         "pyyaml",
-        "zmq",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

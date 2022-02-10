@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-ROS_VERSION=foxy
+ROS_VERSION=galactic
 
 IMAGE_NAME=aica-technology/zmq-simulator
 IMAGE_TAG=latest
