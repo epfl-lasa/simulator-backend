@@ -3,7 +3,7 @@ loop_rate: 500.0
 
 robots:
   panda:
-    urdf_path: /home/ros2/robot_descriptions/franka_panda_description/urdf/panda_arm.urdf
+    urdf_path: /home/ros2/ros2_ws/src/franka_panda_description/urdf/panda_arm.urdf
     fixed_base: True
     use_inertia_from_file: True
     plugins:

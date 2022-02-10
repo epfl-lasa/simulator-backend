@@ -40,11 +40,11 @@ FROM robot-descriptions as install-source
 
 WORKDIR ${HOME}
 COPY --chown=${USER} ./pybullet_simulation ./pybullet_simulation
-RUN pip3 install --editable ./pybullet_simulation
+RUN sudo pip3 install --editable ./pybullet_simulation
 
 WORKDIR ${HOME}
 COPY --chown=${USER} ./pybullet_zmq/ ./pybullet_zmq/
-RUN pip3 install --editable ./pybullet_zmq
+RUN sudo pip3 install --editable ./pybullet_zmq
 
 # Clean image
 RUN sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
