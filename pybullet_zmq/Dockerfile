@@ -10,7 +10,7 @@ RUN sudo apt-get update && sudo apt-get install -y python3-tk && sudo rm -rf /va
 
 WORKDIR /tmp
 USER root
-RUN --mount=type=ssh git clone -b feature/absolute-mesh-paths \
+RUN --mount=type=ssh git clone -b develop \
     --depth 1 git@github.com:aica-technology/urdf-creator.git ./urdf-creator
 RUN chown -R ${USER}:${USER} ./urdf-creator
 USER ${USER}
