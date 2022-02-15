@@ -34,11 +34,17 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+if [[ "$OSTYPE" != "darwin"* ]]; then
+  BUILD_FLAGS+=(--ssh default="${SSH_AUTH_SOCK}")
+else
+  BUILD_FLAGS+=(--ssh default="$HOME/.ssh/id_rsa")
+fi
+
 BUILD_FLAGS+=(--build-arg ROS_VERSION="${ROS_VERSION}")
 BUILD_FLAGS+=(-t "${IMAGE_NAME}:${IMAGE_TAG}")
 
-docker pull ghcr.io/aica-technology/ros2-control-libraries:"${ROS_VERSION}"
-DOCKER_BUILDKIT=1 docker build "${BUILD_FLAGS[@]}" --file ./Dockerfile .. || exit
+docker pull ghcr.io/aica-technology/ros2-control-libraries:"${ROS_VERSION}" || exit 1
+DOCKER_BUILDKIT=1 docker build "${BUILD_FLAGS[@]}" --file ./Dockerfile .. || exit 1
 
 if [ "${SERVE_REMOTE}" = true ]; then
   docker network create sim-net &>/dev/null
