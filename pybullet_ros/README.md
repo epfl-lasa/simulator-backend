@@ -1,6 +1,6 @@
 # PyBullet ROS
 
-PyBullet Simulator with a ROS2 communication interface.
+PyBullet Simulator with a ROS communication interface.
 
 ## Usage instructions
 
