@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
-import os
-
 import launch_ros.actions
+import os
 import rclpy
 import yaml
 from ament_index_python import get_package_share_directory
@@ -65,7 +64,7 @@ def main():
             parameters=[{
                 "robot_description": Command(
                     ["xacro ", os.path.join(get_package_share_directory(yaml_content[robot]["urdf"]["package"]),
-                                            yaml_content[robot]["urdf"]["path"]), " prefix:=_", robot, " xyz:='",
+                                            yaml_content[robot]["urdf"]["path"]), " prefix:=", robot, "_ xyz:='",
                      " ".join(str(pos) for pos in yaml_content[robot]["position"]), "' rpy:='",
                      " ".join(str(pos) for pos in yaml_content[robot]["rpy"]), "'"])
             }],
