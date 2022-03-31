@@ -2,7 +2,6 @@
 
 import importlib
 import os
-
 import rclpy
 import rclpy.node
 import yaml
@@ -51,8 +50,8 @@ class PyBulletRosWrapper(rclpy.node.Node):
         for robot_name in robot_names:
             client = self.create_client(GetParameters, "/" + robot_name + "/robot_state_publisher/get_parameters")
             while not client.wait_for_service(timeout_sec=1.0):
-                self.get_logger().info("Service %s not available, waiting again...",
-                                       "/" + robot_name + "/robot_state_publisher/get_parameters")
+                self.get_logger().info("Service {} not available, waiting again...".format(
+                    "/" + robot_name + "/robot_state_publisher/get_parameters"))
             req = GetParameters.Request()
             req.names = ["robot_description"]
             response = client.call_async(req)

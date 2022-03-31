@@ -96,7 +96,7 @@ class Control:
             if not self._robot.is_torque_controlled:
                 self._pb.setJointMotorControlArray(self._robot.id, self._robot.joint_indices,
                                                    self._pb.VELOCITY_CONTROL,
-                                                   forces=[0] * len(self._robot.joint_indices))
+                                                   forces=[0] * self._robot.nb_joints)
             self._robot.set_torque_control(True)
             self._last_torque_command = self._ec_subscriber.get_last_cmd()
 
