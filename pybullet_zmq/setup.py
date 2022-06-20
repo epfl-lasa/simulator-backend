@@ -14,6 +14,7 @@ setuptools.setup(
     url="https://github.com/epfl-lasa/simulator-backend/tree/develop/pybullet_zmq",
     packages=setuptools.find_packages(),
     install_requires=[
+        "control-libraries>=6.0.0"
         "pybullet_simulation",
         "network_interfaces>=0.1.0",
         "pyyaml",

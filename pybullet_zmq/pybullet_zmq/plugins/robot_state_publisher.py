@@ -1,5 +1,5 @@
 from network_interfaces.zmq import network
-from state_representation import Parameter, StateType
+from state_representation import Parameter, ParameterType
 
 
 class RobotStatePublisher:
@@ -28,7 +28,7 @@ class RobotStatePublisher:
         """
         joint_state = self._robot.get_joint_state()
         mass = Parameter(self._robot.name + "_mass", self._robot.get_inertia(joint_state.get_positions()),
-                         StateType.PARAMETER_MATRIX)
+                         ParameterType.MATRIX)
         state = network.StateMessage(self._robot.get_ee_link_state(), joint_state,
                                      self._robot.get_jacobian(joint_state.get_positions()), mass)
         network.send_state(state, self._publisher)
