@@ -14,7 +14,7 @@ setuptools.setup(
     # url="https://github.com/pypa/sampleproject",
     packages=setuptools.find_packages(),
     install_requires=[
-        "control-libraries>=3.1.0",
+        "control-libraries>=6.0.0",
         "numpy==1.20.2",
         "numba>=0.54.0",
         "scipy>=1.7.1",
