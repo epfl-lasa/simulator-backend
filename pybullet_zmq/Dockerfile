@@ -7,8 +7,8 @@ RUN sudo pip3 install pybullet
 FROM pybullet as network-interfaces
 
 WORKDIR /tmp
-RUN git clone -b develop --depth 1 https://github.com/aica-technology/network-interfaces.git && cd network-interfaces && \
-  sudo bash install.sh --auto --no-cpp
+RUN git clone -b v1.1.0 --depth 1 https://github.com/aica-technology/network-interfaces.git && \
+    cd network-interfaces && sudo bash install.sh --auto --no-cpp
 RUN rm -rf /tmp/network-interfaces
 
 
