@@ -1,4 +1,4 @@
-ARG ROS_VERSION=foxy
+ARG ROS_VERSION=humble
 FROM ghcr.io/aica-technology/ros2-control-libraries:${ROS_VERSION}
 
 RUN sudo apt-get update && sudo apt-get install -y \

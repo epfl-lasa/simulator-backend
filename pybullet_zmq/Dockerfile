@@ -1,4 +1,4 @@
-ARG ROS_VERSION=galactic
+ARG ROS_VERSION=humble
 FROM ghcr.io/aica-technology/ros2-control-libraries:${ROS_VERSION} as pybullet
 
 RUN sudo pip3 install pybullet
