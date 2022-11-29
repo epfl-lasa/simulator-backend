@@ -15,7 +15,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         "control-libraries>=6.0.0",
-        "numpy==1.20.2",
+        "numpy>=1.20.2",
         "numba>=0.54.0",
         "scipy>=1.7.1",
         "pybullet>=3.1.7"

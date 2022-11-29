@@ -9,7 +9,7 @@ FROM pybullet as network-interfaces
 WORKDIR /tmp
 RUN git clone -b v1.1.0 --depth 1 https://github.com/aica-technology/network-interfaces.git && \
     cd network-interfaces && sudo bash install.sh --auto --no-cpp
-RUN rm -rf /tmp/network-interfaces
+RUN sudo rm -rf /tmp/network-interfaces
 
 
 FROM network-interfaces as robot-descriptions
