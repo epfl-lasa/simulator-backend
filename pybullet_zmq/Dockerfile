@@ -1,4 +1,4 @@
-ARG ROS_VERSION=galactic
+ARG ROS_VERSION=humble
 FROM ghcr.io/aica-technology/ros2-control-libraries:${ROS_VERSION} as pybullet
 
 RUN sudo pip3 install pybullet
@@ -9,7 +9,7 @@ FROM pybullet as network-interfaces
 WORKDIR /tmp
 RUN git clone -b v1.1.0 --depth 1 https://github.com/aica-technology/network-interfaces.git && \
     cd network-interfaces && sudo bash install.sh --auto --no-cpp
-RUN rm -rf /tmp/network-interfaces
+RUN sudo rm -rf /tmp/network-interfaces
 
 
 FROM network-interfaces as robot-descriptions
