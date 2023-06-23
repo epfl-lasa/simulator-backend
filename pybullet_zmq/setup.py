@@ -16,7 +16,6 @@ setuptools.setup(
     install_requires=[
         "control_libraries>=6.0.0",
         "pybullet_simulation",
-        "network_interfaces>=1.1.0",
         "pyyaml",
     ],
     classifiers=[

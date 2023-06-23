@@ -1,16 +1,19 @@
 import time
 
 import zmq
-from network_interfaces.zmq import network
 from pybullet_simulation import Robot
 from pybullet_simulation import Simulation
+import clproto
 
 
 def main():
     context = zmq.Context(1)
-    subscriber_address = "0.0.0.0:1602"
-    publisher_address = "0.0.0.0:1601"
-    command_subscriber, state_publisher = network.configure_sockets(context, subscriber_address, publisher_address)
+    state_publisher = context.socket(zmq.PUB)
+    state_publisher.connect("tcp://0.0.0.0:1601")
+    command_subscriber = context.socket(zmq.SUB)
+    command_subscriber.setsockopt(zmq.CONFLATE, 1)
+    command_subscriber.setsockopt_string(zmq.SUBSCRIBE, "")
+    command_subscriber.connect("tcp://0.0.0.0:1602")
 
     desired_frequency = 500.0
 
@@ -24,15 +27,22 @@ def main():
         now = time.time()
         simulation.step()
 
-        ee_state = robot.get_ee_link_state()
-        joint_state = robot.get_joint_state()
-        state = network.StateMessage(ee_state, joint_state)
-        network.send_state(state, state_publisher)
+        msg = clproto.encode(robot.get_joint_state(), clproto.MessageType.JOINT_STATE_MESSAGE)
+        state_publisher.send(msg)
 
-        command = network.receive_command(command_subscriber)
-        if command:
+        try:
+            msg = command_subscriber.recv(zmq.DONTWAIT)
+        except zmq.error.Again:
+            return
+        if not msg:
+            return
+        try:
+            joint_command = clproto.decode(msg)
             print("received command")
-            print(command)
+            print(joint_command)
+        except Exception as e:
+            print(e)
+            return
 
         elapsed = time.time() - now
         sleep_time = (1. / desired_frequency) - elapsed

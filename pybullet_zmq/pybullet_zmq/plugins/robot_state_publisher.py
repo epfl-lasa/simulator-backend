@@ -1,5 +1,5 @@
-from network_interfaces.zmq import network
-from state_representation import Parameter, ParameterType
+import zmq
+from clproto import encode, MessageType
 
 
 class RobotStatePublisher:
@@ -20,15 +20,12 @@ class RobotStatePublisher:
         """
         self._pb = pybullet
         self._robot = robot
-        self._publisher = network.configure_publisher(zmq_context, str(kwargs["URI"]), False)
+        self._publisher = zmq_context.socket(zmq.PUB)
+        self._publisher.connect("tcp://" + str(kwargs["URI"]))
 
     def execute(self):
         """
         Execution function of the plugin.
         """
-        joint_state = self._robot.get_joint_state()
-        mass = Parameter(self._robot.name + "_mass", self._robot.get_inertia(joint_state.get_positions()),
-                         ParameterType.MATRIX)
-        state = network.StateMessage(self._robot.get_ee_link_state(), joint_state,
-                                     self._robot.get_jacobian(joint_state.get_positions()), mass)
-        network.send_state(state, self._publisher)
+        msg = encode(self._robot.get_joint_state(), MessageType.JOINT_STATE_MESSAGE)
+        self._publisher.send(msg)

@@ -1,5 +1,6 @@
-from network_interfaces.control_type import ControlType
-from network_interfaces.zmq import network
+import state_representation as sr
+import zmq
+from clproto import decode
 
 
 class Control:
@@ -20,10 +21,12 @@ class Control:
         """
         self._pb = pybullet
         self._robot = robot
-        self._subscriber = network.configure_subscriber(zmq_context, str(kwargs["URI"]), False)
+        self._subscriber = zmq_context.socket(zmq.SUB)
+        self._subscriber.setsockopt(zmq.CONFLATE, 1)
+        self._subscriber.setsockopt_string(zmq.SUBSCRIBE, "")
+        self._subscriber.connect("tcp://" + str(kwargs["URI"]))
 
         self._control_params = {"bodyUniqueId": self._robot.id, "jointIndices": self._robot.joint_indices}
-        self._last_command_type = ControlType.UNDEFINED
         self._last_torque_command = [0] * self._robot.nb_joints
         self._force_commands = [100] * self._robot.nb_joints
 
@@ -31,32 +34,33 @@ class Control:
         """
         Execution function of the plugin.
         """
-        command = network.receive_command(self._subscriber)
-        if command:
-            if len(set(command.control_type)) > 1:
-                raise ValueError("Different control types per joint are currently not allowed. "
-                                 "Make sure all the joints have the same control type.")
-            elif command.control_type[0] == ControlType.POSITION.value:
-                self._robot.set_torque_control(False)
-                self._control_params["controlMode"] = self._pb.POSITION_CONTROL
-                self._control_params["targetPositions"] = command.joint_state.get_positions()
-                self._control_params["forces"] = self._force_commands
-            elif command.control_type[0] == ControlType.VELOCITY.value:
-                self._robot.set_torque_control(False)
-                self._control_params["controlMode"] = self._pb.VELOCITY_CONTROL
-                self._control_params["targetVelocities"] = command.joint_state.get_velocities()
-                self._control_params["forces"] = self._force_commands
-            elif command.control_type[0] == ControlType.EFFORT.value:
-                if self._last_command_type != ControlType.EFFORT:
-                    self._pb.setJointMotorControlArray(self._robot.id, self._robot.joint_indices,
-                                                       self._pb.VELOCITY_CONTROL,
-                                                       forces=[0] * self._robot.nb_joints)
-                self._robot.set_torque_control(True)
-                self._last_torque_command = command.joint_state.get_torques()
-            else:
-                self._robot.set_torque_control(False)
-                if "controlMode" in self._control_params.keys():
-                    self._control_params.pop("controlMode")
+        try:
+            msg = self._subscriber.recv(zmq.DONTWAIT)
+        except zmq.error.Again:
+            return
+        if not msg:
+            return
+        try:
+            joint_command = decode(msg)
+        except Exception as e:
+            print(e)
+            return
+        if joint_command.get_type() == sr.StateType.JOINT_POSITIONS:
+            self._robot.set_torque_control(False)
+            self._control_params["controlMode"] = self._pb.POSITION_CONTROL
+            self._control_params["targetPositions"] = joint_command.get_positions()
+            self._control_params["forces"] = self._force_commands
+        elif joint_command.get_type() == sr.StateType.JOINT_VELOCITIES:
+            self._robot.set_torque_control(False)
+            self._control_params["controlMode"] = self._pb.VELOCITY_CONTROL
+            self._control_params["targetVelocities"] = joint_command.get_velocities()
+            self._control_params["forces"] = self._force_commands
+        elif joint_command.get_type() == sr.StateType.JOINT_TORQUES:
+            self._pb.setJointMotorControlArray(self._robot.id, self._robot.joint_indices,
+                                               self._pb.VELOCITY_CONTROL,
+                                               forces=[0] * self._robot.nb_joints)
+            self._robot.set_torque_control(True)
+            self._last_torque_command = joint_command.get_torques()
 
         if self._robot.is_torque_controlled:
             self._control_params["controlMode"] = self._pb.TORQUE_CONTROL
