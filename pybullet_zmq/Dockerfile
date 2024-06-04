@@ -31,4 +31,4 @@ COPY --chown=${USER} ./pybullet_zmq/ ./pybullet_zmq/
 RUN sudo pip3 install --editable ./pybullet_zmq
 
 # Clean image
-cdRUN sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
+RUN sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
