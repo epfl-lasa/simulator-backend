@@ -29,7 +29,7 @@ class PyBulletZmqWrapper:
 
         self._pb = importlib.import_module("pybullet")
         self._zmq_context = zmq.Context(1)
-        self._simulation = Simulation(gui_options="--width=1000 --height=1000", log_info=print, log_warn=self.print_warn, log_err=self.print_err)
+        self._simulation = Simulation(log_info=print, log_warn=self.print_warn, log_err=self.print_err)
 
         with open(config_file, "r") as stream:
             robot_config = yaml.safe_load(stream)
