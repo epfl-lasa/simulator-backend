@@ -16,7 +16,7 @@ class Simulation(object):
         - add_pybullet_path
     """
 
-    def __init__(self, gui=True, gui_options="", start_paused=False, log_info=print, log_warn=print, log_err=print):
+    def __init__(self, gui=True, gui_options="", hide_menu=True, start_paused=False, log_info=print, log_warn=print, log_err=print):
         """
         Constructor of the Simulation class. This class creates the PyBullet server / GUI and steps the simulation.
 
@@ -45,6 +45,7 @@ class Simulation(object):
             self._log_info("[Simulation::init] Running PyBullet with GUI")
             self._log_info("-------------------------")
             self._uid = pb.connect(pb.GUI, options=gui_options)
+            if hide_menu: pb.configureDebugVisualizer(pb.COV_ENABLE_GUI, 0)  # Hides menu in GUI
         else:
             self._log_info("[Simulation::init] Running PyBullet without GUI")
             self._log_info("-------------------------")
@@ -54,6 +55,7 @@ class Simulation(object):
 
         # add path to PyBullet models (for simple models like the plane and a table)
         self.add_pybullet_path()
+
 
     @property
     def uid(self):
