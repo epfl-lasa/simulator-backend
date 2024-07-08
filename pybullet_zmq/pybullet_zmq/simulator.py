@@ -9,7 +9,6 @@ from pybullet_simulation import FuncExecManager
 from pybullet_simulation import Robot
 from pybullet_simulation import Simulation
 
-
 class PyBulletZmqWrapper:
     """ZMQ wrapper class for pybullet simulator"""
 
@@ -46,7 +45,7 @@ class PyBulletZmqWrapper:
                           use_inertia_from_file=robot_config["robots"][robot_name]["use_inertia_from_file"],
                           log_info=print, log_warn=self.print_warn, log_err=self.print_err)
             self._robots[robot_name] = robot
-
+            
             # import plugins dynamically
             for plugin in robot_config["robots"][robot_name]["plugins"]:
                 plugin_ = plugin.copy()
@@ -62,6 +61,7 @@ class PyBulletZmqWrapper:
 
         self._pb.setGravity(0, 0, -9.81)
         self._pb.loadURDF('plane.urdf')
+
         print("[PyBulletZmqWrapper::init] PyBullet ZMQ wrapper initialized.")
 
     def _start_pybullet_zmq_wrapper_sequential(self, loop_rate):
@@ -123,7 +123,6 @@ class PyBulletZmqWrapper:
         :type msg: str
         """
         print("\033[31m" + msg + "\033[0m")
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Start PyBullet simulation with ZMQ interface.")

@@ -3,7 +3,9 @@ loop_rate: 500.0
 
 robots:
   panda:
-    urdf_path: /home/ros2/ros2_ws/src/franka_panda_description/urdf/panda_arm.urdf
+    #urdf_path: /home/ros2/ros2_ws/src/franka_panda_description/urdf/panda_arm.urdf
+    #urdf_path: /home/ros2/ros2_ws/src/franka_panda_description/urdf/panda_arm_test.urdf
+    urdf_path: /home/ros2/ros2_ws/src/franka_panda/panda.urdf
     fixed_base: True
     use_inertia_from_file: True
     plugins:
@@ -13,3 +15,6 @@ robots:
       - module: pybullet_zmq.plugins.control
         class: Control
         URI: "0.0.0.0:1602"
+      - module: pybullet_zmq.plugins.obstacle_manager
+        class: ObstacleManager
+        URI: "0.0.0.0:4567"
