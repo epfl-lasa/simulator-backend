@@ -59,7 +59,7 @@ class RobotDescription(object):
         # load robot from URDF model, user decides if inertia is computed automatically by PyBullet or custom
         # self collision is on by default
         if use_inertia_from_file:
-            urdf_flags = pb.URDF_USE_INERTIA_FROM_FILE | pb.URDF_USE_SELF_COLLISION # | pb.URDF_ENABLE_CACHED_GRAPHICS_SHAPES | pb.URDF_USE_MATERIAL_COLORS_FROM_MTL
+            urdf_flags = pb.URDF_USE_INERTIA_FROM_FILE | pb.URDF_USE_SELF_COLLISION | pb.URDF_ENABLE_CACHED_GRAPHICS_SHAPES | pb.URDF_USE_MATERIAL_COLORS_FROM_MTL
         else:
             urdf_flags = pb.URDF_USE_SELF_COLLISION
         self._id = pb.loadURDF(urdf_path, useFixedBase=fixed_base, flags=urdf_flags,

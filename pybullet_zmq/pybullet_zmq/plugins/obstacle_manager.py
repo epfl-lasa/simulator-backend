@@ -6,7 +6,7 @@ import zmq
 
 class ObstacleManager:
     """
-    Control the robot in position, velocity, and torque mode.
+    Display the obstacles for the robot as either spheres, cylinders or 'planes'
     """
 
     def __init__(self, zmq_context, pybullet, robot, **kwargs):
@@ -24,36 +24,12 @@ class ObstacleManager:
         self._robot = robot
         self._subscriber = network.configure_subscriber(zmq_context, str(kwargs["URI"]), True)
 
-        self.spheres_id = []
-        self.spheres_size = []
+        self.obstacles_id = []
+        self.obstacles_scale = []
         self.matlab_id = []
 
         self.color = [.7, .1, .1, 1]
         self.color = [.63, .07, .185, 1]
-
-        print("init obstacel manager")
-        ## circle movement 
-        # self.center = [0,0,0.5]
-        # self.radius = 0.5
-        # self.angle = 0.0
-
-    # def create_sphere(self, position, radius, color):
-    #     sphere = self._pb.createVisualShape(self._pb.GEOM_SPHERE,
-    #                                        radius=radius,
-    #                                        rgbaColor=color, specularColor=[0, 0, 0, 1])
-    #     sphere = self._pb.createMultiBody(baseVisualShapeIndex=sphere,
-    #                                      basePosition=position)
-    #     self.spheres_id.append(sphere)
-
-    # def initialize_spheres(self, obstacle_array):
-    #     for obstacle in obstacle_array:
-    #         self.create_sphere(obstacle[0:3], obstacle[3], self.color)
-
-    def delete_sphere(self, idx):
-        self._pb.removeBody(self.spheres_id[idx])
-        del self.spheres_id[idx]
-        del self.spheres_size[idx]
-        del self.matlab_id[idx]
 
     def zmq_try_recv(self):
         try:
@@ -66,8 +42,14 @@ class ObstacleManager:
         except Exception as e:
             print(f"Error receiving ZMQ message: {e}")
             return None
+        
+    def delete_obstacle(self, idx):
+        self._pb.removeBody(self.obstacles_id[idx])
+        del self.obstacles_id[idx]
+        del self.obstacles_scale[idx]
+        del self.matlab_id[idx]
 
-    def add_sphere(self, msg_dict):
+    def add_obstacle(self, msg_dict):
 
         matlab_id = msg_dict['id']
         position = [msg_dict['pose']['position']['x'],  msg_dict['pose']['position']['y'],  msg_dict['pose']['position']['z']]
@@ -98,11 +80,11 @@ class ObstacleManager:
             # Add the visual plane as a multibody with no mass
             new_id = self._pb.createMultiBody(baseMass=0, baseVisualShapeIndex=visual_plane_shape, basePosition=position)
 
-        self.spheres_id.append(new_id)
-        self.spheres_size.append(radius)
+        self.obstacles_id.append(new_id)
+        self.obstacles_scale.append(radius)
         self.matlab_id.append(matlab_id)
 
-    def update_sphere(self, msg_dict):
+    def update_obstacle(self, msg_dict):
 
         matlab_id = msg_dict['id']
         new_position = [msg_dict['pose']['position']['x'],  msg_dict['pose']['position']['y'],  msg_dict['pose']['position']['z']]
@@ -110,22 +92,22 @@ class ObstacleManager:
         new_color = [msg_dict['color']['r'], msg_dict['color']['g'], msg_dict['color']['b'], msg_dict['color']['a']]
 
         idx = self.matlab_id.index(matlab_id)
-        sphere_id = self.spheres_id[idx]
-        sphere_radius = self.spheres_size[idx]
+        obstacle_id = self.obstacles_id[idx]
+        obstacle_scale = self.obstacles_scale[idx]
 
-        pos, _ = self._pb.getBasePositionAndOrientation(sphere_id)
+        pos, _ = self._pb.getBasePositionAndOrientation(obstacle_id)
         
         if pos != new_position: ## update new_position
-            self._pb.resetBasePositionAndOrientation(sphere_id, new_position, [1, 0, 0, 0])
+            self._pb.resetBasePositionAndOrientation(obstacle_id, new_position, [1, 0, 0, 0])
 
-        if sphere_radius != new_radius: ## update new size
+        if obstacle_scale != new_radius: ## update new size
             print("UPDATING SIZE")
-            self.delete_sphere(idx)
-            self.add_sphere(msg_dict)
+            self.delete_obstacle(idx)
+            self.add_obstacle(msg_dict)
 
         if new_color == [0,0,0,0]: ##deleted in matlab, remove here too
             print( "Removing Sphere")
-            self.delete_sphere(idx)
+            self.delete_obstacle(idx)
 
     def execute(self):
         """
@@ -141,12 +123,12 @@ class ObstacleManager:
             new_id = msg_dict['id']
 
             if new_id in self.matlab_id :  # Object already exists
-                self.update_sphere(msg_dict)
+                self.update_obstacle(msg_dict)
             else :  # Object does not exist and must be created
                 print("Number of spheres and obstacles do not match")
-                #self.delete_spheres()
+                #self.delete_obstacles()
                 #for id in range(existing_id_count + 1, new_id + 1):  # Start from the next ID to the new one
-                self.add_sphere(msg_dict)
+                self.add_obstacle(msg_dict)
 
 
 
