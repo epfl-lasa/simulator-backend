@@ -20,7 +20,7 @@ class RobotStatePublisher:
         """
         self._pb = pybullet
         self._robot = robot
-        self._publisher = network.configure_publisher(zmq_context, str(kwargs["URI"]), False)
+        self._publisher = network.configure_publisher(zmq_context, str(kwargs["URI"]), True)
 
     def execute(self):
         """

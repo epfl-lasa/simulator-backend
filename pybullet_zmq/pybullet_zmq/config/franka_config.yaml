@@ -9,7 +9,7 @@ robots:
     plugins:
       - module: pybullet_zmq.plugins.robot_state_publisher
         class: RobotStatePublisher
-        URI: "0.0.0.0:1601"
+        URI: "*:1601"
       - module: pybullet_zmq.plugins.control
         class: Control
         URI: "0.0.0.0:1602"
