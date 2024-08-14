@@ -31,7 +31,7 @@ class PathDisplayManager:
         self.interval = 10
         self.distance_threshold = 5
 
-        self.interval_robot = 10
+        self.interval_robot = 100
         self.first_pose = None
         self.last_displayed_pose = None
 
@@ -85,52 +85,54 @@ class PathDisplayManager:
             
             if len(msg_dict['poses']) >= self.interval:  # received traj to plot 
                     
-                    if msg_dict['color'] == [1,0,0]: ## red = ds
-                        ## Reduce number of points depending on interval
-                        new_poses = msg_dict['poses'][::self.interval]
-                        new_msg_dict = {'color' : [1,0,0], 'poses' : []}
-                        new_msg_dict['poses'] = new_poses
-                        self.display_trajectory(new_msg_dict)
+                    new_poses = msg_dict['poses'][::self.interval]
+                    new_msg_dict = {'color' : msg_dict['color'], 'poses' : []}
+                    new_msg_dict['poses'] = new_poses
+                    self.display_trajectory(new_msg_dict)
 
-                    elif msg_dict['color'] == [0,1,0]: ## green = robot
+                    # if msg_dict['color'] == [1,0,0]: ## red = ds
+                    #     ## Reduce number of points depending on interval
+                    #     new_poses = msg_dict['poses'][::self.interval]
+                    #     new_msg_dict = {'color' : [1,0,0], 'poses' : []}
+                    #     new_msg_dict['poses'] = new_poses
+                    #     self.display_trajectory(new_msg_dict)
+
+                    # elif msg_dict['color'] == [0,1,0]: ## green = robot
                         
-                        if len(msg_dict['poses']) >= self.interval_robot:
-                            if self.first_pose is None: ## first time receiving msg
-                                self.first_pose = msg_dict['poses'][0]
-                                self.last_displayed_pose = msg_dict['poses'][-1]
-                                self.last_displayed_idx = len(msg_dict['poses'])
+                    #     if len(msg_dict['poses']) >= self.interval_robot:
+                    #         if self.first_pose is None: ## first time receiving msg
+                    #             self.first_pose = msg_dict['poses'][0]
+                    #             self.last_displayed_pose = msg_dict['poses'][-1]
+                    #             self.last_displayed_idx = len(msg_dict['poses'])
 
-                                new_poses = msg_dict['poses'][::self.interval_robot]
-                                new_msg_dict = {'color' : [0,1,0], 'poses' : []}
-                                new_msg_dict['poses'] = new_poses
-                                self.display_trajectory(new_msg_dict)
+                    #             new_poses = msg_dict['poses'][::self.interval_robot]
+                    #             new_msg_dict = {'color' : [0,1,0], 'poses' : []}
+                    #             new_msg_dict['poses'] = new_poses
+                    #             self.display_trajectory(new_msg_dict)
 
 
-                            elif (len(msg_dict['poses'])-self.last_displayed_idx) > self.interval_robot: 
+                    #         elif (len(msg_dict['poses'])-self.last_displayed_idx) > self.interval_robot: 
                             
-                                new_msg_dict = {'color' : [0,1,0], 'poses' : []}
-                                new_msg_dict['poses'].append(self.last_displayed_pose)
-                                new_msg_dict['poses'].append(msg_dict['poses'][-1])
-                                self.last_displayed_pose = msg_dict['poses'][-1]
-                                self.last_displayed_idx = len(msg_dict['poses'])
-                                self.display_trajectory(new_msg_dict)
+                    #             new_msg_dict = {'color' : [0,1,0], 'poses' : []}
+                    #             new_msg_dict['poses'].append(self.last_displayed_pose)
+                    #             new_msg_dict['poses'].append(msg_dict['poses'][-1])
+                    #             self.last_displayed_pose = msg_dict['poses'][-1]
+                    #             self.last_displayed_idx = len(msg_dict['poses'])
+                    #             self.display_trajectory(new_msg_dict)
 
             else:
                 if msg_dict['color'] == [0,1,0]:
                     for line_id in self.robot_traj_id:
                         self._pb.removeUserDebugItem(line_id)
                     self.robot_traj_id.clear()
+                    self.first_pose = None
+                    self.last_displayed_pose = None
+                    self.last_displayed_idx = None
         
                 elif msg_dict['color'] == [1,0,0]:
                     for line_id in self.ds_traj_id:
                         self._pb.removeUserDebugItem(line_id)
                     self.ds_traj_id.clear()
-                    self.first_pose = None
-                    self.last_displayed_pose = None
-                    self.last_displayed_idx = None
+
             
             return
-
-
-
-
