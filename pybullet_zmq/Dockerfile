@@ -1,7 +1,7 @@
 ARG ROS_VERSION=humble
 FROM ghcr.io/aica-technology/ros2-control-libraries:${ROS_VERSION} as pybullet
 
-RUN sudo pip3 install pybullet
+RUN sudo pip3 install pybullet torch==1.13.1
 
 
 FROM pybullet as network-interfaces

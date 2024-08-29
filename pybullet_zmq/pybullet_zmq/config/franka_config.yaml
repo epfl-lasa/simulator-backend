@@ -14,7 +14,7 @@ robots:
       - module: pybullet_zmq.plugins.control
         class: Control
         URI: "0.0.0.0:1602"
-      - module: pybullet_zmq.plugins.obstacle_manager
+      - module: pybullet_zmq.plugins.obstacle_manager ## Display obstacles
         class: ObstacleManager
         URI: "0.0.0.0:4567"
       - module: pybullet_zmq.plugins.path_display_manager ## DS planned trajectory
@@ -23,3 +23,6 @@ robots:
       - module: pybullet_zmq.plugins.path_display_manager  ## Robot executed trajectory
         class: PathDisplayManager
         URI: "0.0.0.0:6543"
+      - module: pybullet_zmq.plugins.kernel_manager  ## display robot configurations
+        class: KernelManager
+        URI: "0.0.0.0:1338"

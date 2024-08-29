@@ -65,4 +65,5 @@ class Control:
             self._robot.set_applied_motor_torques(torques)
 
         if "controlMode" in self._control_params.keys():
+            # print(f"Sending command to robot : {self._control_params}")
             self._pb.setJointMotorControlArray(**self._control_params)

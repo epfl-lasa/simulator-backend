@@ -28,12 +28,10 @@ class PathDisplayManager:
         self.ds_traj_id = []
         self.robot_traj_id = []
 
-        self.interval = 10
-        self.distance_threshold = 5
-
-        self.interval_robot = 100
-        self.first_pose = None
-        self.last_displayed_pose = None
+        self.interval_ds = 3 # minimum 2 
+        self.interval_robot = 10
+        # self.first_pose = None
+        # self.last_displayed_pose = None
 
     def zmq_try_recv(self):
         try:
@@ -82,13 +80,37 @@ class PathDisplayManager:
         msg_dict = self.zmq_try_recv()
 
         if msg_dict is not None:
-            
-            if len(msg_dict['poses']) >= self.interval:  # received traj to plot 
-                    
-                    new_poses = msg_dict['poses'][::self.interval]
+
+            if msg_dict['color'] == [1,0,0]: ## red = ds
+                if len(msg_dict['poses']) >= self.interval_ds: ## Show line
+                    ## Reduce number of points depending on interval
+                    new_poses = msg_dict['poses'][::self.interval_ds]
                     new_msg_dict = {'color' : msg_dict['color'], 'poses' : []}
                     new_msg_dict['poses'] = new_poses
                     self.display_trajectory(new_msg_dict)
+                else :  ## Remove line
+                    for line_id in self.ds_traj_id:
+                        self._pb.removeUserDebugItem(line_id)
+                    self.ds_traj_id.clear()
+                    
+            elif msg_dict['color'] == [0,1,0]: ## green = robot
+                if len(msg_dict['poses']) >= self.interval_robot: ## Show line
+                    ## Reduce number of points depending on interval
+                    new_poses = msg_dict['poses'][::self.interval_robot]
+                    new_msg_dict = {'color' : msg_dict['color'], 'poses' : []}
+                    new_msg_dict['poses'] = new_poses
+                    self.display_trajectory(new_msg_dict)
+                else : ## Remove line
+                    for line_id in self.robot_traj_id:
+                        self._pb.removeUserDebugItem(line_id)
+                    self.robot_traj_id.clear()
+
+             # received traj to plot 
+                    
+                # new_poses = msg_dict['poses'][::self.interval]
+                # new_msg_dict = {'color' : msg_dict['color'], 'poses' : []}
+                # new_msg_dict['poses'] = new_poses
+                # self.display_trajectory(new_msg_dict)
 
                     # if msg_dict['color'] == [1,0,0]: ## red = ds
                     #     ## Reduce number of points depending on interval
@@ -120,19 +142,19 @@ class PathDisplayManager:
                     #             self.last_displayed_idx = len(msg_dict['poses'])
                     #             self.display_trajectory(new_msg_dict)
 
-            else:
-                if msg_dict['color'] == [0,1,0]:
-                    for line_id in self.robot_traj_id:
-                        self._pb.removeUserDebugItem(line_id)
-                    self.robot_traj_id.clear()
-                    self.first_pose = None
-                    self.last_displayed_pose = None
-                    self.last_displayed_idx = None
+            # else:
+            #     if msg_dict['color'] == [0,1,0]:
+            #         for line_id in self.robot_traj_id:
+            #             self._pb.removeUserDebugItem(line_id)
+            #         self.robot_traj_id.clear()
+            #         self.first_pose = None
+            #         self.last_displayed_pose = None
+            #         self.last_displayed_idx = None
         
-                elif msg_dict['color'] == [1,0,0]:
-                    for line_id in self.ds_traj_id:
-                        self._pb.removeUserDebugItem(line_id)
-                    self.ds_traj_id.clear()
+            #     elif msg_dict['color'] == [1,0,0]:
+            #         for line_id in self.ds_traj_id:
+            #             self._pb.removeUserDebugItem(line_id)
+            #         self.ds_traj_id.clear()
 
             
             return
