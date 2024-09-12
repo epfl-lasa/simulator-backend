@@ -27,9 +27,12 @@ class PathDisplayManager:
 
         self.ds_traj_id = []
         self.robot_traj_id = []
+        self.demo_id= []
+        self.last_demo_id = [] #to delete last demo
 
         self.interval_ds = 3 # minimum 2 
         self.interval_robot = 10
+        self.interval_demo = 5
         # self.first_pose = None
         # self.last_displayed_pose = None
 
@@ -46,6 +49,7 @@ class PathDisplayManager:
 
     def display_trajectory(self, msg_dict):
         poses = msg_dict['poses']
+ 
         for i in range(len(poses) - 1):
             start_pos = [
                 poses[i]['pose']['position']['x'],
@@ -64,6 +68,9 @@ class PathDisplayManager:
                 self.ds_traj_id.append(line_id)
             elif msg_dict['color'] == [0,1,0]:  ## green = robot
                 self.robot_traj_id.append(line_id)
+            elif msg_dict['color'] == [0,0,1]:  ## green = robot
+                self.demo_id.append(line_id)
+                self.last_demo_id.append(line_id)
     
     def calculate_distance(self, pos1, pos2):
         return math.sqrt(
@@ -105,6 +112,27 @@ class PathDisplayManager:
                         self._pb.removeUserDebugItem(line_id)
                     self.robot_traj_id.clear()
 
+            elif msg_dict['color'] == [0,0,1]: ## blue = demo
+                if len(msg_dict['poses']) >= self.interval_demo: ## Show line
+                    ## Reduce number of points depending on interval
+                    new_poses = msg_dict['poses'][::self.interval_demo]
+                    new_msg_dict = {'color' : msg_dict['color'], 'poses' : []}
+                    new_msg_dict['poses'] = new_poses
+                    self.last_demo_id.clear()
+                    self.display_trajectory(new_msg_dict)
+                else : ## Remove line
+                    if msg_dict['frame_id'] == 'remove_last':
+                        for line_id in self.last_demo_id:
+                            self._pb.removeUserDebugItem(line_id)
+                        self.last_demo_id.clear()
+                        ## TODO : before last traj becomes last traj ??
+                        demo_length = int(200/self.interval_demo)
+                        for line_id in self.demo_id[-demo_length:]:
+                            self.last_demo_id.append(line_id)
+                    elif msg_dict['frame_id'] == 'remove_all':
+                        for line_id in self.demo_id:
+                            self._pb.removeUserDebugItem(line_id)
+                        self.demo_id.clear()
              # received traj to plot 
                     
                 # new_poses = msg_dict['poses'][::self.interval]

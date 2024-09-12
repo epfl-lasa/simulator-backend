@@ -23,6 +23,9 @@ robots:
       - module: pybullet_zmq.plugins.path_display_manager  ## Robot executed trajectory
         class: PathDisplayManager
         URI: "0.0.0.0:6543"
+      - module: pybullet_zmq.plugins.path_display_manager  ## Demonstrations trajectory
+        class: PathDisplayManager
+        URI: "0.0.0.0:5634"
       - module: pybullet_zmq.plugins.kernel_manager  ## display robot configurations
         class: KernelManager
         URI: "0.0.0.0:1338"
