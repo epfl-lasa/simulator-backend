@@ -28,11 +28,13 @@ class ObstacleManager:
 
         self.obstacles_id = []
         self.obstacles_scale = []
+        self.obstacles_color = []
         self.matlab_id = []
         
         # params for predefined obstacles
         self.spheres_id = []
-        self.color = [.63, .07, .185, 1]
+        # self.color = [.63, .07, .185, 1] ## red
+        self.color = [.18, .545, .341, 1] ## seagreen
         self.predefined_obstacles()
 
     def zmq_try_recv(self):
@@ -151,6 +153,7 @@ class ObstacleManager:
         self._pb.removeBody(self.obstacles_id[idx])
         del self.obstacles_id[idx]
         del self.obstacles_scale[idx]
+        del self.obstacles_color[idx]
         del self.matlab_id[idx]
 
     def add_obstacle(self, msg_dict):
@@ -186,6 +189,7 @@ class ObstacleManager:
 
         self.obstacles_id.append(new_id)
         self.obstacles_scale.append(radius)
+        self.obstacles_color.append(color)
         self.matlab_id.append(matlab_id)
 
     def update_obstacle(self, msg_dict):
@@ -198,6 +202,7 @@ class ObstacleManager:
         idx = self.matlab_id.index(matlab_id)
         obstacle_id = self.obstacles_id[idx]
         obstacle_scale = self.obstacles_scale[idx]
+        obstacle_color = self.obstacles_color[idx]
 
         pos, _ = self._pb.getBasePositionAndOrientation(obstacle_id)
         
@@ -209,9 +214,14 @@ class ObstacleManager:
             self.delete_obstacle(idx)
             self.add_obstacle(msg_dict)
 
-        if new_color == [0,0,0,0]: ##deleted in matlab, remove here too
-            print( "Removing Sphere")
-            self.delete_obstacle(idx)
+        if new_color != obstacle_color:
+            if new_color == [0,0,0,0]: ##deleted in matlab, remove here too
+                print( "Removing Sphere")
+                self.delete_obstacle(idx)
+            else : ## selected obstacle
+                print(f"updating color! {new_color}")
+                self._pb.changeVisualShape(obstacle_id, linkIndex=-1, rgbaColor=new_color)
+                self.obstacles_color[idx] = new_color
 
     def execute(self):
         """
@@ -226,6 +236,7 @@ class ObstacleManager:
 
             new_id = msg_dict['id']
             new_type = msg_dict['ns']
+
             if new_type == 'world' : ## single obstacle
                 if new_id in self.matlab_id :  # Object already exists
                     self.update_obstacle(msg_dict)
