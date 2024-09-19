@@ -46,6 +46,7 @@ class Simulation(object):
             self._log_info("-------------------------")
             self._uid = pb.connect(pb.GUI, options=gui_options)
             if hide_menu: pb.configureDebugVisualizer(pb.COV_ENABLE_GUI, 0)  # Hides menu in GUI
+            pb.resetDebugVisualizerCamera(2.5, 50.0, -35.0, [0.0, 0.0, 0.0]) ## Set camera view 
         else:
             self._log_info("[Simulation::init] Running PyBullet without GUI")
             self._log_info("-------------------------")
